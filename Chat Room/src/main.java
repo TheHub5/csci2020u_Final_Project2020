@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -21,8 +20,10 @@ public class main extends Application {
     private int port = 7777;
     private String ip = "localhost";
     private TextArea messages = new TextArea();
+    private TextField input = new TextField();
+    private boolean isServer;
 
-    public Scene start, joinServer, game;
+    public Scene start, joinServer, gameScene;
     public Group groupGame;
 
     @Override
@@ -69,15 +70,21 @@ public class main extends Application {
         messages.setPrefHeight(550);
         messages.setLayoutX(10);
         messages.setEditable(false);
-        TextField input = new TextField();
         input.setPrefWidth(480);
         input.setLayoutX(10);
         input.setLayoutY(570);
 
         create.setOnAction(e -> {
-            NetworkConnection connection = createServer();
+            isServer = true;
+            NetworkConnection chatConnection = createServer();
+            NetworkConnection gameConnection = createServer();
             try {
-                connection.startConnection();
+                game(gameConnection, stage);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            try {
+                chatConnection.startConnection();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -89,24 +96,26 @@ public class main extends Application {
                 messages.appendText(message + "\n");
 
                 try {
-                    connection.send(message);
+                    chatConnection.send(message);
                 } catch (Exception ex) {
                     messages.appendText("Failed to send\n");
                 }
             });
-            groupGame = new Group();
-            groupGame.getChildren().addAll(input, messages);
-            game = new Scene(groupGame, 500, 600);
-            stage.setScene(game);
         });
 
         join.setOnAction(e -> {
-
+            isServer = false;
             JS.setOnAction(e1 -> {
                 ip = ipF.getText();
-                NetworkConnection connection = createClient(ip);
+                NetworkConnection chatConnection = createClient(ip);
+                NetworkConnection gameConnection = createClient(ip);
                 try {
-                    connection.startConnection();
+                    game(gameConnection, stage);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    chatConnection.startConnection();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -119,17 +128,11 @@ public class main extends Application {
                     messages.appendText(message + "\n");
 
                     try {
-                        connection.send(message);
+                        chatConnection.send(message);
                     } catch (Exception ex) {
                         messages.appendText("Failed to send\n");
                     }
                 });
-
-                game();
-                groupGame = new Group();
-                groupGame.getChildren().addAll(input, messages);
-                game = new Scene(groupGame, 500, 600);
-                stage.setScene(game);
             });
 
             joinServer = new Scene(gridJoin, 400, 300);
@@ -155,7 +158,17 @@ public class main extends Application {
         });
     }
 
-    public void game(){
+    public void game(NetworkConnection conn, Stage stage) throws Exception {
         //Instantiation of Battleship Game here
+        Battleship game = new Battleship(isServer, conn);
+
+        VBox gameBoard = game.playGame();
+        gameBoard.setLayoutX(600);
+        gameBoard.setLayoutY(40);
+
+        groupGame = new Group();
+        groupGame.getChildren().addAll(input, messages, gameBoard);
+        gameScene = new Scene(groupGame, 1000, 600);
+        stage.setScene(gameScene);
     }
 }

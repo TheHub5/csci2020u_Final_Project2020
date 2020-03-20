@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -32,7 +31,7 @@ public abstract class NetworkConnection {
     protected abstract String getIP();
     protected abstract int getPort();
 
-    private class ConnectionThread extends Thread {
+    public class ConnectionThread extends Thread {
         private Socket socket;
         private ObjectOutputStream out;
 
