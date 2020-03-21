@@ -1,8 +1,10 @@
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -13,10 +15,10 @@ public class Battleship {
     public Board playerBoard;
     public Board enemyBoard;
     private int shipsToPlace = 5;
-    private boolean myTurn = true;
+    public boolean myTurn = false;
     private boolean isServer;
     private NetworkConnection connection;
-    private boolean isLocked = false;
+    public boolean isLocked = false;
 
     public Battleship(boolean isServer, NetworkConnection connection){
         this.connection = connection;
@@ -41,6 +43,28 @@ public class Battleship {
             if (shipsToPlace == 0){
                 isLocked = true;
                 lockIn.setVisible(false);
+                myTurn = true;
+
+                int[][] gridLayout = new int[10][10];
+                boolean[][] vertical = new boolean[10][10];
+                for (int i = 0; i < 10; i++){
+                    for (int j = 0; j < 10; j++){
+                        Cell c = playerBoard.getCell(j, i);
+                        if (c.ship != null){
+                            gridLayout[j][i] = playerBoard.getCell(j, i).ship.type;
+                            vertical[j][i] = playerBoard.getCell(j, i).ship.vertical;
+                        } else {
+                            gridLayout[j][i] = 0;
+                            vertical[j][i] = false;
+                        }
+                    }
+                }
+                try {
+                    connection.send(vertical);
+                    connection.send(gridLayout);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
@@ -54,11 +78,11 @@ public class Battleship {
             }
         });
 
-        Group group = new Group(playerBoard, enemyBoard, lockIn);
-        playerBoard.setLayoutX(0);
-        playerBoard.setLayoutY(350);
-        enemyBoard.setLayoutX(0);
-        enemyBoard.setLayoutY(10);
+        Group group = new Group(playerBoard.playerGrid, enemyBoard.playerGrid, lockIn);
+        playerBoard.playerGrid.setLayoutX(0);
+        playerBoard.playerGrid.setLayoutY(350);
+        enemyBoard.playerGrid.setLayoutX(0);
+        enemyBoard.playerGrid.setLayoutY(10);
         return group;
     }
 

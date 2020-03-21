@@ -1,9 +1,11 @@
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -23,6 +25,8 @@ public class main extends Application {
     private TextField input = new TextField();
     private Text warning = new Text();
     private boolean isServer;
+    private Battleship game;
+    private boolean[][] vertical = null;
 
     public Scene start, joinServer, gameScene, createServer;
     public Group groupGame;
@@ -124,6 +128,7 @@ public class main extends Application {
                     }
                     try {
                         chatConnection.startConnection();
+                        gameConnection.startConnection();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -162,6 +167,7 @@ public class main extends Application {
                 }
                 try {
                     chatConnection.startConnection();
+                    gameConnection.startConnection();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -204,7 +210,39 @@ public class main extends Application {
     private Server createGameServer(int port) {
         return new Server(port, data-> {
             Platform.runLater(() -> {
-                messages.appendText(data.toString() + "\n");
+                if (data instanceof boolean[][]){
+                    vertical = (boolean[][]) data;
+                }
+                if (data instanceof int[][] && vertical != null){
+                    int[][] gridLayout = (int[][]) data;
+
+                    game.enemyBoard = new Board(gridLayout, vertical, event ->{
+                        if (game.isLocked && game.myTurn){
+                            Cell cell = (Cell) event.getSource();
+                            if (cell.wasShot == false) {
+                                cell.shoot();
+                                game.myTurn = false;
+                            }
+                        }
+                    });
+
+                    for (int i = 0; i < 10; i++){
+                        for (int j = 0; j < 10; j++){
+                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
+                        }
+                        System.out.println();
+                    }
+
+                    System.out.println();
+                    System.out.println();
+
+                    for (int i = 0; i < 10; i++){
+                        for (int j = 0; j < 10; j++){
+                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
+                        }
+                        System.out.println();
+                    }
+                }
             });
         });
     }
@@ -212,14 +250,46 @@ public class main extends Application {
     private Client createGameClient(String ip, int port) {
         return new Client(ip, port, data -> {
             Platform.runLater(() -> {
-                messages.appendText(data.toString() + "\n");
+                if (data instanceof boolean[][]){
+                    vertical = (boolean[][]) data;
+                }
+                if (data instanceof int[][] && vertical != null){
+                    int[][] gridLayout = (int[][]) data;
+
+                    game.enemyBoard = new Board(gridLayout, vertical, event ->{
+                        if (game.isLocked && game.myTurn){
+                            Cell cell = (Cell) event.getSource();
+                            if (cell.wasShot == false) {
+                                cell.shoot();
+                                game.myTurn = false;
+                            }
+                        }
+                    });
+
+                    for (int i = 0; i < 10; i++){
+                        for (int j = 0; j < 10; j++){
+                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
+                        }
+                        System.out.println();
+                    }
+
+                    System.out.println();
+                    System.out.println();
+
+                    for (int i = 0; i < 10; i++){
+                        for (int j = 0; j < 10; j++){
+                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
+                        }
+                        System.out.println();
+                    }
+                }
             });
         });
     }
 
     public void game(NetworkConnection conn, Stage stage) throws Exception {
         //Instantiation of Battleship Game here
-        Battleship game = new Battleship(isServer, conn);
+        game = new Battleship(isServer, conn);
 
         Group gameBoard = game.playGame();
         gameBoard.setLayoutX(500);

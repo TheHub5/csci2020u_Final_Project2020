@@ -8,7 +8,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 
-public class Board extends Parent{
+public class Board {
     VBox playerGrid = new VBox();
     public int ships = 5;
 
@@ -23,8 +23,21 @@ public class Board extends Parent{
 
             playerGrid.getChildren().add(row);
         }
+    }
 
-        getChildren().add(playerGrid);
+    public Board(int[][] gridLayout, boolean[][] vertical, EventHandler<? super MouseEvent> handler) {
+        playerGrid.getChildren().clear();
+        for (int i = 0; i < 10; i++){
+            HBox row = new HBox();
+            for (int j = 0; j < 10; j++){
+                Cell c = new Cell(j, i, this);
+                c.setOnMouseClicked(handler);
+                Ship s = new Ship(gridLayout[j][i], vertical[j][i]);
+                c.ship = s;
+                row.getChildren().add(c);
+            }
+            playerGrid.getChildren().add(row);
+        }
     }
 
     public boolean checkWin(){
