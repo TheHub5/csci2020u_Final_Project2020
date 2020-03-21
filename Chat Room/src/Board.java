@@ -27,6 +27,11 @@ public class Board extends Parent{
         getChildren().add(playerGrid);
     }
 
+    public boolean checkWin(){
+        if (this.ships == 0) return true;
+        else return false;
+    }
+
     public boolean placeShip(Ship ship, int x, int y) {
         if (canPlaceShip(ship, x, y)) {
             int length = ship.type;
@@ -35,7 +40,7 @@ public class Board extends Parent{
                 for (int i = y; i < y + length; i++) {
                     Cell cell = getCell(x, i);
                     cell.ship = ship;
-                    cell.setFill(Color.WHITE);
+                    cell.setFill(Color.LIMEGREEN);
                     cell.setStroke(Color.GREEN);
                 }
             }
@@ -43,7 +48,7 @@ public class Board extends Parent{
                 for (int i = x; i < x + length; i++) {
                     Cell cell = getCell(i, y);
                     cell.ship = ship;
-                    cell.setFill(Color.WHITE);
+                    cell.setFill(Color.LIMEGREEN);
                     cell.setStroke(Color.GREEN);
                 }
             }
