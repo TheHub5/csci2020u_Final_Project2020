@@ -17,8 +17,9 @@ public class Battleship {
     private int shipsToPlace = 5;
     public boolean myTurn = false;
     private boolean isServer;
-    private NetworkConnection connection;
+    public NetworkConnection connection;
     public boolean isLocked = false;
+    public Group group;
 
     public Battleship(boolean isServer, NetworkConnection connection){
         this.connection = connection;
@@ -40,7 +41,7 @@ public class Battleship {
         });
 
         lockIn.setOnAction(e -> {
-            if (shipsToPlace == 0){
+            if (shipsToPlace == 0 && connection.connThread.socket.isConnected()){
                 isLocked = true;
                 lockIn.setVisible(false);
                 myTurn = true;
@@ -68,21 +69,9 @@ public class Battleship {
             }
         });
 
-        enemyBoard = new Board(event -> {
-            if (isLocked && myTurn){
-                Cell cell = (Cell) event.getSource();
-                if (cell.wasShot == false) {
-                    cell.shoot();
-                    myTurn = false;
-                }
-            }
-        });
-
-        Group group = new Group(playerBoard.playerGrid, enemyBoard.playerGrid, lockIn);
+        group = new Group(playerBoard.playerGrid, lockIn);
         playerBoard.playerGrid.setLayoutX(0);
         playerBoard.playerGrid.setLayoutY(350);
-        enemyBoard.playerGrid.setLayoutX(0);
-        enemyBoard.playerGrid.setLayoutY(10);
         return group;
     }
 

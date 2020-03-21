@@ -29,7 +29,7 @@ public abstract class NetworkConnection {
     protected abstract int getPort();
 
     public class ConnectionThread extends Thread {
-        private Socket socket;
+        public Socket socket;
         private ObjectOutputStream out;
         private ObjectInputStream in;
 

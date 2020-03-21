@@ -210,6 +210,13 @@ public class main extends Application {
     private Server createGameServer(int port) {
         return new Server(port, data-> {
             Platform.runLater(() -> {
+                if (data instanceof Integer[]){
+                    Integer[] xy = (Integer[]) data;
+                    game.playerBoard.getCell(xy[0], xy[1]).shoot();
+                }
+                if (data instanceof Boolean){
+                     game.myTurn = true;
+                }
                 if (data instanceof boolean[][]){
                     vertical = (boolean[][]) data;
                 }
@@ -222,26 +229,44 @@ public class main extends Application {
                             if (cell.wasShot == false) {
                                 cell.shoot();
                                 game.myTurn = false;
+                                try {
+                                    Boolean a = true;
+                                    Integer[] xy = new Integer[2];
+                                    xy[0] = cell.x;
+                                    xy[1] = cell.y;
+                                    game.connection.send(a);
+                                    game.connection.send(xy);
+                                    System.out.println(game.enemyBoard.ships);
+                                    if (game.enemyBoard.ships == 0){
+                                        System.out.println("You Win");
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     });
 
-                    for (int i = 0; i < 10; i++){
-                        for (int j = 0; j < 10; j++){
-                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
-                        }
-                        System.out.println();
-                    }
+                    game.enemyBoard.playerGrid.setLayoutX(0);
+                    game.enemyBoard.playerGrid.setLayoutY(10);
+                    game.group.getChildren().add(game.enemyBoard.playerGrid);
 
-                    System.out.println();
-                    System.out.println();
-
-                    for (int i = 0; i < 10; i++){
-                        for (int j = 0; j < 10; j++){
-                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
-                        }
-                        System.out.println();
-                    }
+//                    for (int i = 0; i < 10; i++){
+//                        for (int j = 0; j < 10; j++){
+//                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
+//                        }
+//                        System.out.println();
+//                    }
+//
+//                    System.out.println();
+//                    System.out.println();
+//
+//                    for (int i = 0; i < 10; i++){
+//                        for (int j = 0; j < 10; j++){
+//                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
+//                        }
+//                        System.out.println();
+//                    }
                 }
             });
         });
@@ -250,6 +275,13 @@ public class main extends Application {
     private Client createGameClient(String ip, int port) {
         return new Client(ip, port, data -> {
             Platform.runLater(() -> {
+                if (data instanceof Integer[]){
+                    Integer[] xy = (Integer[]) data;
+                    game.playerBoard.getCell(xy[0], xy[1]).shoot();
+                }
+                if (data instanceof Boolean){
+                    game.myTurn = true;
+                }
                 if (data instanceof boolean[][]){
                     vertical = (boolean[][]) data;
                 }
@@ -262,26 +294,44 @@ public class main extends Application {
                             if (cell.wasShot == false) {
                                 cell.shoot();
                                 game.myTurn = false;
+                                try {
+                                    Boolean a = true;
+                                    Integer[] xy = new Integer[2];
+                                    xy[0] = cell.x;
+                                    xy[1] = cell.y;
+                                    game.connection.send(a);
+                                    game.connection.send(xy);
+                                    System.out.println(game.playerBoard.ships);
+                                    if (game.enemyBoard.ships == 0){
+                                        System.out.println("You Win");
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     });
 
-                    for (int i = 0; i < 10; i++){
-                        for (int j = 0; j < 10; j++){
-                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
-                        }
-                        System.out.println();
-                    }
+                    game.enemyBoard.playerGrid.setLayoutX(0);
+                    game.enemyBoard.playerGrid.setLayoutY(10);
+                    game.group.getChildren().add(game.enemyBoard.playerGrid);
 
-                    System.out.println();
-                    System.out.println();
-
-                    for (int i = 0; i < 10; i++){
-                        for (int j = 0; j < 10; j++){
-                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
-                        }
-                        System.out.println();
-                    }
+//                    for (int i = 0; i < 10; i++){
+//                        for (int j = 0; j < 10; j++){
+//                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
+//                        }
+//                        System.out.println();
+//                    }
+//
+//                    System.out.println();
+//                    System.out.println();
+//
+//                    for (int i = 0; i < 10; i++){
+//                        for (int j = 0; j < 10; j++){
+//                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
+//                        }
+//                        System.out.println();
+//                    }
                 }
             });
         });

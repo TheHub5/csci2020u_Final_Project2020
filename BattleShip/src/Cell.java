@@ -19,16 +19,15 @@ public class Cell extends Rectangle {
 
     public boolean shoot() {
         wasShot = true;
-        setFill(Color.BLACK);
 
-        if (ship != null) {
+        if (ship.type != 0) {
             ship.hit();
             setFill(Color.RED);
             if (!ship.isAlive()) {
                 board.ships--;
             }
             return true;
-        }
+        } else setFill(Color.BLACK);
 
         return false;
     }
