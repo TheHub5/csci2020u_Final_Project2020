@@ -54,7 +54,7 @@ public class Battleship {
                 for (int j = 0; j < 10; j++){
                     Cell c = playerBoard.getCell(j, i);
                     c.ship = null;
-                    c.setFill(Color.LIGHTGRAY);
+                    c.setFill(Color.TRANSPARENT);
                     c.setStroke(Color.BLACK);
                 }
             }
