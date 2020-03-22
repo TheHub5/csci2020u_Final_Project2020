@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -131,6 +132,7 @@ public class Main extends Application {
                 if (chatPort > 1 && chatPort < 65534) {
                     NetworkConnection chatConnection = createChatServer(chatPort);
                     NetworkConnection gameConnection = createGameServer(gamePort);
+                    messages.appendText("Server running on port: " + chatPort + "\n");
                     try {
                         game(gameConnection, chatConnection, stage);
                         chatConnection.startConnection();
@@ -164,8 +166,11 @@ public class Main extends Application {
                 chatPort = Integer.valueOf(pF1.getText());
                 gamePort = Integer.valueOf(pF1.getText()) - 1;
                 ip = ipF.getText();
+
                 NetworkConnection chatConnection = createChatClient(ip, chatPort);
                 NetworkConnection gameConnection = createGameClient(ip, gamePort);
+                messages.appendText("Connected to: " + ip + ":" + chatPort + "\n");
+            
                 try {
                     game(gameConnection, chatConnection, stage);
                     chatConnection.startConnection();
@@ -194,7 +199,8 @@ public class Main extends Application {
     }
 
     private Server createChatServer(int port) {
-        return new Server(port, data-> {
+        return new Server(port, (data) -> {
+            System.out.println(data.toString());
             Platform.runLater(() -> {
                 messages.appendText(data.toString() + "\n");
             });
@@ -202,7 +208,8 @@ public class Main extends Application {
     }
 
     private Client createChatClient(String ip, int port) {
-        return new Client(ip, port, data -> {
+        return new Client(ip, port, (data) -> {
+            System.out.println(data.toString());
             Platform.runLater(() -> {
                 messages.appendText(data.toString() + "\n");
             });
@@ -210,7 +217,7 @@ public class Main extends Application {
     }
 
     private Server createGameServer(int port) {
-        return new Server(port, data-> {
+        return new Server(port, (data) -> {
             Platform.runLater(() -> {
                 handleOutputStream(data);
             });
@@ -218,7 +225,7 @@ public class Main extends Application {
     }
 
     private Client createGameClient(String ip, int port) {
-        return new Client(ip, port, data -> {
+        return new Client(ip, port, (data) -> {
             Platform.runLater(() -> {
                 handleOutputStream(data);
             });
