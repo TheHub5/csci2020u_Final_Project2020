@@ -3,6 +3,8 @@ package BattleShip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.awt.*;
+
 public class Cell extends Rectangle {
     public int x, y;
     public Ship ship = null;
@@ -15,8 +17,9 @@ public class Cell extends Rectangle {
         this.x = x;
         this.y = y;
         this.board = board;
-        setFill(Color.LIGHTGRAY);
+        setFill(Color.TRANSPARENT);
         setStroke(Color.BLACK);
+        setOpacity(0.7);
     }
 
     public boolean shoot() {

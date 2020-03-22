@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -14,6 +15,10 @@ public class Board {
     VBox playerGrid = new VBox();
     public int ships = 5;
 
+    BackgroundImage water = new BackgroundImage(new Image("images/water.jpg",400,400,false,true),
+            BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+            BackgroundSize.DEFAULT);
+
     public Board(EventHandler<? super MouseEvent> handler) {
         for (int y = 0; y < 10; y++) {
             HBox row = new HBox();
@@ -22,7 +27,7 @@ public class Board {
                 c.setOnMouseClicked(handler);
                 row.getChildren().add(c);
             }
-
+            playerGrid.setBackground(new Background(water));
             playerGrid.getChildren().add(row);
         }
     }

@@ -30,12 +30,11 @@ public class Main extends Application {
     private TextArea messages = new TextArea();
     private TextField input = new TextField();
     private Text warning = new Text();
-    private Text gameOverText = new Text();
-    private boolean isServer;
+    private Text WinLoseText = new Text();
     private Battleship game;
     private boolean[][] vertical = null;
 
-    public Scene start, joinServer, gameScene, createServer;
+    public Scene start, joinServer, gameScene, createServer, EndScreen;
     public Group groupGame;
 
     @Override
@@ -120,8 +119,12 @@ public class Main extends Application {
         warning.setX(400);
         warning.setY(350);
 
+        Group endScreen = new Group();
+        EndScreen = new Scene(endScreen, 400, 400);
+
+        //endScreen.getChildren().add();
+
         create.setOnAction(e -> {
-            isServer = true;
             CS.setOnAction(e1 -> {
                 chatPort = Integer.valueOf(pF.getText());
                 gamePort = Integer.valueOf(pF.getText()) - 1;
@@ -129,16 +132,13 @@ public class Main extends Application {
                     NetworkConnection chatConnection = createChatServer(chatPort);
                     NetworkConnection gameConnection = createGameServer(gamePort);
                     try {
-                        game(gameConnection, stage);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    try {
+                        game(gameConnection, chatConnection, stage);
                         chatConnection.startConnection();
                         gameConnection.startConnection();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
+
                     input.setOnAction(e2 -> {
                         String message = "Player1: ";
                         message += input.getText();
@@ -160,7 +160,6 @@ public class Main extends Application {
         });
 
         join.setOnAction(e -> {
-            isServer = false;
             JS.setOnAction(e1 -> {
                 chatPort = Integer.valueOf(pF1.getText());
                 gamePort = Integer.valueOf(pF1.getText()) - 1;
@@ -168,11 +167,7 @@ public class Main extends Application {
                 NetworkConnection chatConnection = createChatClient(ip, chatPort);
                 NetworkConnection gameConnection = createGameClient(ip, gamePort);
                 try {
-                    game(gameConnection, stage);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                try {
+                    game(gameConnection, chatConnection, stage);
                     chatConnection.startConnection();
                     gameConnection.startConnection();
                 } catch (Exception ex) {
@@ -245,6 +240,11 @@ public class Main extends Application {
             int[][] gridLayout = (int[][]) data;
 
             game.enemyBoard = new Board(gridLayout, vertical, event ->{
+                if (game.enemyBoard.ships == 0){
+
+                } if (game.playerBoard.ships == 0) {
+
+                }
                 if (game.isLocked && game.myTurn){
                     Cell cell = (Cell) event.getSource();
                     if (cell.wasShot == false) {
@@ -255,18 +255,8 @@ public class Main extends Application {
                             Integer[] xy = new Integer[2];
                             xy[0] = cell.x;
                             xy[1] = cell.y;
-                            game.connection.send(a);
-                            game.connection.send(xy);
-                            System.out.println(game.playerBoard.ships);
-                            if (game.enemyBoard.ships == 0){
-                                System.out.println("You Win");
-                            } if (game.playerBoard.ships == 0) {
-                                System.out.println("You Lose");
-                                // send message to opponent that they have won
-                                gameOverText.setFont(new Font(50));
-                                gameOverText.setText("Game Over");
-                                gameOverText.setTextAlignment(TextAlignment.CENTER);
-                            }
+                            game.gameConn.send(a);
+                            game.gameConn.send(xy);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -297,18 +287,20 @@ public class Main extends Application {
         }
     }
 
-    public void game(NetworkConnection conn, Stage stage) throws Exception {
+    public void game(NetworkConnection gameConn, NetworkConnection chatConn, Stage stage) throws Exception {
         //Instantiation of Battleship Game here
-        game = new Battleship(isServer, conn);
+        game = new Battleship(gameConn, chatConn, messages);
 
         Group gameBoard = game.playGame();
         gameBoard.setLayoutX(500);
         gameBoard.setLayoutY(0);
+        WinLoseText.setX(250);
+        WinLoseText.setY(150);
 
         warning.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
 
         groupGame = new Group();
-        groupGame.getChildren().addAll(input, messages, gameBoard);
+        groupGame.getChildren().addAll(input, messages, gameBoard, WinLoseText);
         gameScene = new Scene(groupGame, 1000, 700);
         stage.setScene(gameScene);
     }
