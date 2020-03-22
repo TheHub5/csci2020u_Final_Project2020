@@ -50,6 +50,8 @@ public class Board {
     public boolean placeShip(Ship ship, int x, int y) {
         if (canPlaceShip(ship, x, y)) {
             int length = ship.type;
+            ship.x = x;
+            ship.y = y;
 
             if (ship.vertical) {
                 for (int i = y; i < y + length; i++) {
@@ -107,7 +109,7 @@ public class Board {
                 Cell cell = getCell(x, i);
                 if (cell.ship != null)
                     return false;
-
+/*
                 for (Cell neighbor : getNeighbors(x, i)) {
                     if (!isValidPoint(x, i))
                         return false;
@@ -115,6 +117,7 @@ public class Board {
                     if (neighbor.ship != null)
                         return false;
                 }
+*/
             }
         }
         else {
@@ -125,7 +128,7 @@ public class Board {
                 Cell cell = getCell(i, y);
                 if (cell.ship != null)
                     return false;
-
+/*
                 for (Cell neighbor : getNeighbors(i, y)) {
                     if (!isValidPoint(i, y))
                         return false;
@@ -133,6 +136,7 @@ public class Board {
                     if (neighbor.ship != null)
                         return false;
                 }
+*/
             }
         }
 
