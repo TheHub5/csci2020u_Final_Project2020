@@ -77,5 +77,13 @@ public class Battleship {
         return group;
     }
 
+    public void gameOver() throws Exception{
+    //lock board and possibly display message
+    }
+
+    public void restartGame() throws Exception{
+    //reset board and game variables here
+    }
+
     public Board getBoard(){return playerBoard;}
 }
