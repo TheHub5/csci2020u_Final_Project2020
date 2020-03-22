@@ -22,7 +22,7 @@ public class Cell extends Rectangle {
     public boolean shoot() {
         wasShot = true;
 
-        if (ship.type != 0) {
+        if (ship != null && ship.type != 0) {
             ship.hit();
             setFill(Color.RED);
             if (!ship.isAlive()) {

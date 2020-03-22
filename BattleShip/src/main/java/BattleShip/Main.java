@@ -255,7 +255,7 @@ public class Main extends Application {
                             xy[1] = cell.y;
                             game.connection.send(a);
                             game.connection.send(xy);
-                            System.out.println(game.playerBoard.ships);
+                            System.out.println(game.enemyBoard.ships);
                             if (game.enemyBoard.ships == 0){
                                 System.out.println("You Win");
                             }
