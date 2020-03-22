@@ -13,6 +13,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.Serializable;
+import java.util.function.Consumer;
+
 public class main extends Application {
 
     public static void main(String[] args) {
@@ -210,64 +213,7 @@ public class main extends Application {
     private Server createGameServer(int port) {
         return new Server(port, data-> {
             Platform.runLater(() -> {
-                if (data instanceof Integer[]){
-                    Integer[] xy = (Integer[]) data;
-                    game.playerBoard.getCell(xy[0], xy[1]).shoot();
-                }
-                if (data instanceof Boolean){
-                     game.myTurn = true;
-                }
-                if (data instanceof boolean[][]){
-                    vertical = (boolean[][]) data;
-                }
-                if (data instanceof int[][] && vertical != null){
-                    int[][] gridLayout = (int[][]) data;
-
-                    game.enemyBoard = new Board(gridLayout, vertical, event ->{
-                        if (game.isLocked && game.myTurn){
-                            Cell cell = (Cell) event.getSource();
-                            if (cell.wasShot == false) {
-                                cell.shoot();
-                                game.myTurn = false;
-                                try {
-                                    Boolean a = true;
-                                    Integer[] xy = new Integer[2];
-                                    xy[0] = cell.x;
-                                    xy[1] = cell.y;
-                                    game.connection.send(a);
-                                    game.connection.send(xy);
-                                    System.out.println(game.enemyBoard.ships);
-                                    if (game.enemyBoard.ships == 0){
-                                        System.out.println("You Win");
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    });
-
-                    game.enemyBoard.playerGrid.setLayoutX(0);
-                    game.enemyBoard.playerGrid.setLayoutY(10);
-                    game.group.getChildren().add(game.enemyBoard.playerGrid);
-
-//                    for (int i = 0; i < 10; i++){
-//                        for (int j = 0; j < 10; j++){
-//                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
-//                        }
-//                        System.out.println();
-//                    }
-//
-//                    System.out.println();
-//                    System.out.println();
-//
-//                    for (int i = 0; i < 10; i++){
-//                        for (int j = 0; j < 10; j++){
-//                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
-//                        }
-//                        System.out.println();
-//                    }
-                }
+                handleOutputStream(data);
             });
         });
     }
@@ -275,46 +221,52 @@ public class main extends Application {
     private Client createGameClient(String ip, int port) {
         return new Client(ip, port, data -> {
             Platform.runLater(() -> {
-                if (data instanceof Integer[]){
-                    Integer[] xy = (Integer[]) data;
-                    game.playerBoard.getCell(xy[0], xy[1]).shoot();
-                }
-                if (data instanceof Boolean){
-                    game.myTurn = true;
-                }
-                if (data instanceof boolean[][]){
-                    vertical = (boolean[][]) data;
-                }
-                if (data instanceof int[][] && vertical != null){
-                    int[][] gridLayout = (int[][]) data;
+                handleOutputStream(data);
+            });
+        });
+    }
 
-                    game.enemyBoard = new Board(gridLayout, vertical, event ->{
-                        if (game.isLocked && game.myTurn){
-                            Cell cell = (Cell) event.getSource();
-                            if (cell.wasShot == false) {
-                                cell.shoot();
-                                game.myTurn = false;
-                                try {
-                                    Boolean a = true;
-                                    Integer[] xy = new Integer[2];
-                                    xy[0] = cell.x;
-                                    xy[1] = cell.y;
-                                    game.connection.send(a);
-                                    game.connection.send(xy);
-                                    System.out.println(game.playerBoard.ships);
-                                    if (game.enemyBoard.ships == 0){
-                                        System.out.println("You Win");
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+    private void handleOutputStream(Serializable data){
+        if (data instanceof Integer[]){
+            Integer[] xy = (Integer[]) data;
+            game.playerBoard.getCell(xy[0], xy[1]).shoot();
+        }
+        if (data instanceof Boolean){
+            game.myTurn = true;
+        }
+        if (data instanceof boolean[][]){
+            vertical = (boolean[][]) data;
+        }
+        if (data instanceof int[][] && vertical != null){
+            int[][] gridLayout = (int[][]) data;
+
+            game.enemyBoard = new Board(gridLayout, vertical, event ->{
+                if (game.isLocked && game.myTurn){
+                    Cell cell = (Cell) event.getSource();
+                    if (cell.wasShot == false) {
+                        cell.shoot();
+                        game.myTurn = false;
+                        try {
+                            Boolean a = true;
+                            Integer[] xy = new Integer[2];
+                            xy[0] = cell.x;
+                            xy[1] = cell.y;
+                            game.connection.send(a);
+                            game.connection.send(xy);
+                            System.out.println(game.playerBoard.ships);
+                            if (game.enemyBoard.ships == 0){
+                                System.out.println("You Win");
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    });
+                    }
+                }
+            });
 
-                    game.enemyBoard.playerGrid.setLayoutX(0);
-                    game.enemyBoard.playerGrid.setLayoutY(10);
-                    game.group.getChildren().add(game.enemyBoard.playerGrid);
+            game.enemyBoard.playerGrid.setLayoutX(0);
+            game.enemyBoard.playerGrid.setLayoutY(10);
+            game.group.getChildren().add(game.enemyBoard.playerGrid);
 
 //                    for (int i = 0; i < 10; i++){
 //                        for (int j = 0; j < 10; j++){
@@ -332,9 +284,7 @@ public class main extends Application {
 //                        }
 //                        System.out.println();
 //                    }
-                }
-            });
-        });
+        }
     }
 
     public void game(NetworkConnection conn, Stage stage) throws Exception {
