@@ -7,10 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 
 import java.io.Serializable;
@@ -27,6 +24,7 @@ public class main extends Application {
     private TextArea messages = new TextArea();
     private TextField input = new TextField();
     private Text warning = new Text();
+    private Text gameOverText = new Text();
     private boolean isServer;
     private Battleship game;
     private boolean[][] vertical = null;
@@ -253,9 +251,12 @@ public class main extends Application {
                             xy[1] = cell.y;
                             game.connection.send(a);
                             game.connection.send(xy);
-                            System.out.println(game.playerBoard.ships);
-                            if (game.enemyBoard.ships == 0){
-                                System.out.println("You Win");
+                            if (game.playerBoard.ships == 0){
+                                System.out.println("You Lose");
+                                //send message to opponent that they have won, so the game can end for them
+                                gameOverText.setFont(new Font(50));
+                                gameOverText.setText("Game Over");
+                                gameOverText.setTextAlignment(TextAlignment.CENTER);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
