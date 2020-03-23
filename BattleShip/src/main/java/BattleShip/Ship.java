@@ -1,8 +1,16 @@
 package BattleShip;
 
 import javafx.scene.Parent;
+import javafx.scene.media.Media;
+import java.io.File;
+import javafx.scene.media.MediaPlayer;
 
 public class Ship extends Parent {
+
+    String blast = "src/main/resources/blast.aiff";
+    Media sound = new Media(new File(blast).toURI().toString());
+    MediaPlayer mediaPlayer = new MediaPlayer(sound);
+
     public int type;
     public boolean vertical = true;
     public int x, y;
@@ -15,6 +23,8 @@ public class Ship extends Parent {
     }
 
     public void hit() {
+        Main.messages.appendText("A ship was hit!" + "\n");
+        mediaPlayer.play();
         health--;
     }
 
