@@ -55,10 +55,12 @@ public class Cell extends Rectangle {
         //loop through board, set all ships which have 0 health to dark red color
         for(int x = 0;x<10;x++){
             for(int y = 0;y<10;y++){
-                if(ship != null && board.getCell(x,y) != null)
+                Cell c = board.getCell(x,y);
+                if(c.ship != null && c != null)
                 {
-                    if(board.getCell(x,y).ship.isAlive() == false)
-                        board.getCell(x,y).setFill(Color.DARKRED);
+                    if(c.ship.isAlive() == false){
+                        c.setFill(Color.DARKRED);
+                    }
                 }
 
             }
