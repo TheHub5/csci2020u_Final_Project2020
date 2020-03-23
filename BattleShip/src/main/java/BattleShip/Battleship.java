@@ -1,5 +1,6 @@
 package BattleShip;
 
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 import javafx.geometry.Pos;
@@ -122,5 +123,14 @@ public class Battleship {
         Scene popupScene = new Scene(popupVbox,300,200);
         popup.setScene(popupScene);
         popup.show();
+
+        exit.setOnAction(e->{
+            //popup.close();
+            Platform.exit();
+        });
+
+        restart.setOnAction(e1->{
+
+        });
     }
 }
