@@ -236,9 +236,26 @@ public class Main extends Application {
     }
 
     private void handleOutputStream(Serializable data){
+        if (data instanceof String) {
+            System.out.println("You Win");
+            game.endScreen(false);
+        }
+            
         if (data instanceof Integer[]){
             Integer[] xy = (Integer[]) data;
             game.playerBoard.getCell(xy[0], xy[1]).shoot();
+            if (game.playerBoard.ships == 0) {
+                System.out.println("You Lose");
+                try {
+                    String gameOver = "Game Over";
+                    game.gameConn.send(gameOver);
+                } catch (Exception e) {
+                    System.out.println("Fuck me");
+                } finally {
+                    game.endScreen(true);
+                }
+            }
+           
         }
         if (data instanceof Boolean){
             game.myTurn = true;
@@ -250,11 +267,6 @@ public class Main extends Application {
             int[][] gridLayout = (int[][]) data;
 
             game.enemyBoard = new Board(gridLayout, vertical, event ->{
-                if (game.enemyBoard.ships == 0){
-
-                } if (game.playerBoard.ships == 0) {
-
-                }
                 if (game.isLocked && game.myTurn){
                     Cell cell = (Cell) event.getSource();
                     if (cell.wasShot == false) {

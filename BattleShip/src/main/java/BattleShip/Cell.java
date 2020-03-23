@@ -29,6 +29,7 @@ public class Cell extends Rectangle {
             setFill(Color.RED);
             if (!ship.isAlive()) {
                 board.ships--;
+                /*
                 if (ship.vertical) {
                     for (int i = ship.y; i < ship.y + ship.type; i++) {
                         board.getCell(ship.x, i).setFill(Color.DARKRED);
@@ -40,6 +41,7 @@ public class Cell extends Rectangle {
                         System.out.println(board.getCell(i, ship.y).x + ", " + board.getCell(i, ship.y).y);
                     }
                 }
+                */
             }
             return true;
         } else setFill(Color.BLACK);
