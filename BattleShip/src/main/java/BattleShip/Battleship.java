@@ -1,5 +1,7 @@
 package BattleShip;
 
+import javafx.stage.Stage;
+import javafx.stage.Modality;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -9,6 +11,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -100,13 +103,24 @@ public class Battleship {
         return group;
     }
 
-    public void gameOver() throws Exception{
-    //lock board and possibly display message
-    }
-
-    public void restartGame() throws Exception{
-    //reset board and game variables here
-    }
-
     public Board getBoard(){return playerBoard;}
+
+    public void endScreen(boolean won) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        VBox popupVbox = new VBox(2);
+        Text gameOverMessage = new Text();
+        if (won) { gameOverMessage.setText("You Won"); }
+        else { gameOverMessage.setText("You Lost"); }
+        Button restart = new Button("Play Again");
+        Button exit = new Button("Exit");
+        HBox buttons = new HBox(2);
+        buttons.getChildren().add(restart);
+        buttons.getChildren().add(exit);
+        popupVbox.getChildren().add(gameOverMessage);
+        popupVbox.getChildren().add(buttons);
+        Scene popupScene = new Scene(popupVbox,300,200);
+        popup.setScene(popupScene);
+        popup.show();
+    }
 }

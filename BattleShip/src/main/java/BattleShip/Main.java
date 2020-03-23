@@ -17,19 +17,22 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
-
+import java.io.File;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import java.io.Serializable;
 import java.util.function.Consumer;
 
 public class Main extends Application {
-
+    MediaPlayer mediaplayer;
     public static void main(String[] args) {
+
         launch(args);
     }
 
     private int chatPort, gamePort;
     private String ip = "localhost";
-    private TextArea messages = new TextArea();
+    public static TextArea messages = new TextArea();
     private TextField input = new TextField();
     private Text warning = new Text();
     private Text WinLoseText = new Text();
@@ -41,6 +44,18 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        String song = "src/main/resources/epic.mp3";
+        Media musicfile = new Media (getClass().getClassLoader().getResource("epic.mp3").toExternalForm());
+        mediaplayer = new MediaPlayer(musicfile);
+        mediaplayer.setVolume(0.3);
+        mediaplayer.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                mediaplayer.play();
+            }
+
+        });
+
         GridPane gridStart = new GridPane();
         gridStart.setHgap(10);
         gridStart.setVgap(70);
@@ -135,6 +150,9 @@ public class Main extends Application {
                 if (chatPort > 1 && chatPort < 65534) {
                     NetworkConnection chatConnection = createChatServer(chatPort);
                     NetworkConnection gameConnection = createGameServer(gamePort);
+                    mediaplayer.play();
+                    messages.appendText("Entered room as Player 1" + "\n");
+                    stage.setTitle("Battleship Player 1");
                     messages.appendText("Server running on port: " + chatPort + "\n");
                     try {
                         game(gameConnection, chatConnection, stage);
@@ -172,8 +190,10 @@ public class Main extends Application {
 
                 NetworkConnection chatConnection = createChatClient(ip, chatPort);
                 NetworkConnection gameConnection = createGameClient(ip, gamePort);
+                messages.appendText("Entered room as Player 2" + "\n");
+                stage.setTitle("Battleship Player 2");
                 messages.appendText("Connected to: " + ip + ":" + chatPort + "\n");
-            
+
                 try {
                     game(gameConnection, chatConnection, stage);
                     chatConnection.startConnection();
