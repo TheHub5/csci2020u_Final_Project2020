@@ -23,7 +23,6 @@ public class Ship extends Parent {
     }
 
     public void hit() {
-        Main.messages.appendText("A ship was hit!" + "\n");
         mediaPlayer.play();
         health--;
     }

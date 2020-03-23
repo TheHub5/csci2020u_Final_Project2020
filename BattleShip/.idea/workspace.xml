@@ -24,7 +24,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../csci2020u_Final_Project2020/BattleShip" />
     <property name="show.unlinked.gradle.project.popup" value="true" />
   </component>
   <component name="RunManager">
@@ -61,26 +61,26 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="740" y="274" key="FileChooserDialogImpl" timestamp="1584919182805">
+    <state x="740" y="274" key="FileChooserDialogImpl" timestamp="1584988169331">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584919182805" />
-    <state width="1877" height="126" key="GridCell.Tab.0.bottom" timestamp="1584987774547">
+    <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584988169331" />
+    <state width="1877" height="126" key="GridCell.Tab.0.bottom" timestamp="1584988729221">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.bottom/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584987774547" />
-    <state width="1877" height="126" key="GridCell.Tab.0.center" timestamp="1584987774546">
+    <state width="1877" height="126" key="GridCell.Tab.0.bottom/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584988729221" />
+    <state width="1877" height="126" key="GridCell.Tab.0.center" timestamp="1584988729221">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.center/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584987774546" />
-    <state width="1877" height="126" key="GridCell.Tab.0.left" timestamp="1584987774546">
+    <state width="1877" height="126" key="GridCell.Tab.0.center/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584988729221" />
+    <state width="1877" height="126" key="GridCell.Tab.0.left" timestamp="1584988729221">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.left/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584987774546" />
-    <state width="1877" height="126" key="GridCell.Tab.0.right" timestamp="1584987774547">
+    <state width="1877" height="126" key="GridCell.Tab.0.left/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584988729221" />
+    <state width="1877" height="126" key="GridCell.Tab.0.right" timestamp="1584988729221">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.right/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584987774547" />
+    <state width="1877" height="126" key="GridCell.Tab.0.right/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584988729221" />
     <state width="1877" height="241" key="GridCell.Tab.1.bottom" timestamp="1584912458371">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
