@@ -65,22 +65,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584919182805" />
-    <state width="1877" height="126" key="GridCell.Tab.0.bottom" timestamp="1584919237053">
+    <state width="1877" height="126" key="GridCell.Tab.0.bottom" timestamp="1584933037612">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.bottom/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584919237053" />
-    <state width="1877" height="126" key="GridCell.Tab.0.center" timestamp="1584919237053">
+    <state width="1877" height="126" key="GridCell.Tab.0.bottom/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584933037612" />
+    <state width="1877" height="126" key="GridCell.Tab.0.center" timestamp="1584933037612">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.center/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584919237053" />
-    <state width="1877" height="126" key="GridCell.Tab.0.left" timestamp="1584919237053">
+    <state width="1877" height="126" key="GridCell.Tab.0.center/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584933037612" />
+    <state width="1877" height="126" key="GridCell.Tab.0.left" timestamp="1584933037612">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.left/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584919237053" />
-    <state width="1877" height="126" key="GridCell.Tab.0.right" timestamp="1584919237053">
+    <state width="1877" height="126" key="GridCell.Tab.0.left/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584933037612" />
+    <state width="1877" height="126" key="GridCell.Tab.0.right" timestamp="1584933037612">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="126" key="GridCell.Tab.0.right/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584919237053" />
+    <state width="1877" height="126" key="GridCell.Tab.0.right/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584933037612" />
     <state width="1877" height="241" key="GridCell.Tab.1.bottom" timestamp="1584912458371">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -97,6 +97,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="241" key="GridCell.Tab.1.right/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584912458371" />
+    <state x="618" y="209" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1584919543232">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="618" y="209" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1040/-2560.-223.2048.1112@0.0.1920.1040" timestamp="1584919543232" />
     <state x="537" y="255" width="846" height="603" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1584907955507">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

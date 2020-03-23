@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.control.*;
@@ -47,6 +48,10 @@ public class Main extends Application {
         stage.setScene(start);
 
         BackgroundImage myBI= new BackgroundImage(new Image("images/image1.jpg",400,400,false,true),
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
+        BackgroundImage gameBI= new BackgroundImage(new Image("images/grass.jpg",1000,700,false,true),
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
 
@@ -200,7 +205,6 @@ public class Main extends Application {
 
     private Server createChatServer(int port) {
         return new Server(port, (data) -> {
-            System.out.println(data.toString());
             Platform.runLater(() -> {
                 messages.appendText(data.toString() + "\n");
             });
@@ -209,7 +213,6 @@ public class Main extends Application {
 
     private Client createChatClient(String ip, int port) {
         return new Client(ip, port, (data) -> {
-            System.out.println(data.toString());
             Platform.runLater(() -> {
                 messages.appendText(data.toString() + "\n");
             });
@@ -268,6 +271,19 @@ public class Main extends Application {
                             e.printStackTrace();
                         }
                     }
+                    //This does not work
+//                    if (!cell.ship.isAlive()) {
+//                        Ship ship = cell.ship;
+//                        if (ship.vertical) {
+//                            for (int i = ship.y; i < ship.y + ship.type; i++) {
+//                                game.enemyBoard.getCell(ship.x, i).setFill(Color.DARKRED);
+//                            }
+//                        } else {
+//                            for (int i = ship.x; i < ship.x + ship.type; i++) {
+//                                game.enemyBoard.getCell(i, ship.y).setFill(Color.DARKRED);
+//                            }
+//                        }
+//                    }
                 }
             });
 

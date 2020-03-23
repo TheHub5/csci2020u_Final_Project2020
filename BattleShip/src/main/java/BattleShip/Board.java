@@ -34,15 +34,16 @@ public class Board {
 
     public Board(int[][] gridLayout, boolean[][] vertical, EventHandler<? super MouseEvent> handler) {
         playerGrid.getChildren().clear();
-        for (int i = 0; i < 10; i++){
+        for (int y = 0; y < 10; y++){
             HBox row = new HBox();
-            for (int j = 0; j < 10; j++){
-                Cell c = new Cell(j, i, this);
+            for (int x = 0; x < 10; x++){
+                Cell c = new Cell(x, y, this);
                 c.setOnMouseClicked(handler);
-                Ship s = new Ship(gridLayout[j][i], vertical[j][i]);
+                Ship s = new Ship(gridLayout[x][y], vertical[x][y]);
                 c.ship = s;
                 row.getChildren().add(c);
             }
+            playerGrid.setBackground(new Background(water));
             playerGrid.getChildren().add(row);
         }
     }
@@ -114,7 +115,7 @@ public class Board {
                 Cell cell = getCell(x, i);
                 if (cell.ship != null)
                     return false;
-/*
+
                 for (Cell neighbor : getNeighbors(x, i)) {
                     if (!isValidPoint(x, i))
                         return false;
@@ -122,7 +123,6 @@ public class Board {
                     if (neighbor.ship != null)
                         return false;
                 }
-*/
             }
         }
         else {
@@ -133,7 +133,7 @@ public class Board {
                 Cell cell = getCell(i, y);
                 if (cell.ship != null)
                     return false;
-/*
+
                 for (Cell neighbor : getNeighbors(i, y)) {
                     if (!isValidPoint(i, y))
                         return false;
@@ -141,7 +141,6 @@ public class Board {
                     if (neighbor.ship != null)
                         return false;
                 }
-*/
             }
         }
 
