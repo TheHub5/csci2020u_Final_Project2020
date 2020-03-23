@@ -28,6 +28,7 @@ public class Cell extends Rectangle {
             ship.hit();
             setFill(Color.RED);
             if (!ship.isAlive()) {
+                setShipSunkColor();
                 board.ships--;
                 /*
                 if (ship.vertical) {
@@ -46,6 +47,21 @@ public class Cell extends Rectangle {
             return true;
         } else setFill(Color.BLACK);
 
+
         return false;
+    }
+
+    public void setShipSunkColor(){
+        //loop through board, set all ships which have 0 health to dark red color
+        for(int x = 0;x<10;x++){
+            for(int y = 0;y<10;y++){
+                if(ship != null && board.getCell(x,y) != null)
+                {
+                    if(board.getCell(x,y).ship.isAlive() == false)
+                        board.getCell(x,y).setFill(Color.DARKRED);
+                }
+
+            }
+        }
     }
 }
