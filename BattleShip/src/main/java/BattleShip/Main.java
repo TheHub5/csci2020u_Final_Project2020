@@ -128,8 +128,6 @@ public class Main extends Application {
         Group endScreen = new Group();
         EndScreen = new Scene(endScreen, 400, 400);
 
-        //endScreen.getChildren().add();
-
         create.setOnAction(e -> {
             CS.setOnAction(e1 -> {
                 chatPort = Integer.valueOf(pF.getText());
@@ -180,6 +178,15 @@ public class Main extends Application {
                     game(gameConnection, chatConnection, stage);
                     chatConnection.startConnection();
                     gameConnection.startConnection();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                try {
+                    Thread.sleep(100);
+                    if (chatConnection.connThread.socket.isConnected()){
+                        chatConnection.send("OPPONENT HAS CONNECTED!");
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
