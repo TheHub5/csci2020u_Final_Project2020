@@ -2,31 +2,27 @@ package BattleShip;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.scene.text.*;
 import javafx.stage.Stage;
-import java.io.File;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import java.io.Serializable;
-import java.util.function.Consumer;
+import java.text.DecimalFormat;
+
+import javafx.scene.control.Slider;
 
 public class Main extends Application {
     MediaPlayer mediaplayer;
     public static void main(String[] args) {
-
         launch(args);
     }
 
@@ -36,10 +32,13 @@ public class Main extends Application {
     private TextField input = new TextField();
     private Text warning = new Text();
     private Text WinLoseText = new Text();
+    private static Text typing = new Text();
     private Battleship game;
     private boolean[][] vertical = null;
+    private MenuBar menuBar = new MenuBar();
+    private double volume = 0.03;
 
-    public Scene start, joinServer, gameScene, createServer, EndScreen;
+    public Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
     public Group groupGame;
 
     @Override
@@ -47,13 +46,12 @@ public class Main extends Application {
         String song = "src/main/resources/epic.mp3";
         Media musicfile = new Media (getClass().getClassLoader().getResource("epic.mp3").toExternalForm());
         mediaplayer = new MediaPlayer(musicfile);
-        mediaplayer.setVolume(0.3);
+        mediaplayer.setVolume(volume);
         mediaplayer.setOnEndOfMedia(new Runnable() {
             @Override
             public void run() {
                 mediaplayer.play();
             }
-
         });
 
         GridPane gridStart = new GridPane();
@@ -127,26 +125,70 @@ public class Main extends Application {
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         text1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         text2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
+        typing.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
 
         gridJoin.setBackground(new Background(myBI));
         gridCreate.setBackground(new Background(myBI));
 
-        messages.setPrefHeight(620);
+        messages.setPrefHeight(610);
+        messages.setLayoutY(30);
         messages.setLayoutX(10);
         messages.setEditable(false);
         input.setPrefWidth(480);
         input.setLayoutX(10);
-        input.setLayoutY(635);
+        input.setLayoutY(665);
         warning.setX(400);
         warning.setY(350);
+        typing.setX(15);
+        typing.setY(658);
 
         Group endScreen = new Group();
         EndScreen = new Scene(endScreen, 400, 400);
 
+        Menu menuFile = new Menu("file");
+
+        MenuItem SettingM = new MenuItem("Setting");
+        MenuItem ExitM = new MenuItem("Exit");
+
+        menuFile.getItems().addAll(SettingM, ExitM);
+        menuBar.getMenus().addAll(menuFile);
+
+        SettingM.setOnAction(e -> {
+            Stage settingPopUp = new Stage();
+
+            Text txt = new Text("Volume");
+            txt.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 13));
+            txt.setX(20);
+            txt.setY(100);
+            DecimalFormat df = new DecimalFormat("#.##");
+            Text txt1 = new Text(df.format(volume));
+            txt1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
+            txt1.setX(300);
+            txt1.setY(100);
+            Slider slider = new Slider();
+            slider.setLayoutX(115);
+            slider.setLayoutY(91);
+            slider.setScaleX(1.4);
+            slider.setScaleY(1.4);
+            slider.setMin(0);
+            slider.setMax(1);
+            slider.setValue(volume);
+            slider.setOnMouseDragged(e1 -> {
+                volume = slider.getValue();
+                mediaplayer.setVolume(volume);
+                txt1.setText(df.format(volume));
+            });
+
+            Group group = new Group(slider, txt, txt1);
+            settingsScene = new Scene(group, 400, 400);
+            settingPopUp.setScene(settingsScene);
+            settingPopUp.show();
+        });
+
         create.setOnAction(e -> {
             CS.setOnAction(e1 -> {
-                chatPort = Integer.valueOf(pF.getText());
-                gamePort = Integer.valueOf(pF.getText()) - 1;
+                chatPort = Integer.parseInt(pF.getText());
+                gamePort = Integer.parseInt(pF.getText()) - 1;
                 if (chatPort > 1 && chatPort < 65534) {
                     NetworkConnection chatConnection = createChatServer(chatPort);
                     NetworkConnection gameConnection = createGameServer(gamePort);
@@ -162,17 +204,29 @@ public class Main extends Application {
                         ex.printStackTrace();
                     }
 
-                    input.setOnAction(e2 -> {
+                    input.setOnKeyPressed(e2 -> {
+                        int value = 12;
+                        System.out.println("lol");
+                        try {
+                            gameConnection.send(12);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+
+                    input.setOnAction(e3 -> {
                         String message = "Player1: ";
                         message += input.getText();
                         input.clear();
 
-                        messages.appendText(message + "\n");
+                        if (!message.equals("Player1: ")) {
+                            messages.appendText(message + "\n");
 
-                        try {
-                            chatConnection.send(message);
-                        } catch (Exception ex) {
-                            messages.appendText("Failed to send\n");
+                            try {
+                                chatConnection.send(message);
+                            } catch (Exception ex) {
+                                messages.appendText("Failed to send\n");
+                            }
                         }
                     });
                 } else {
@@ -184,8 +238,8 @@ public class Main extends Application {
 
         join.setOnAction(e -> {
             JS.setOnAction(e1 -> {
-                chatPort = Integer.valueOf(pF1.getText());
-                gamePort = Integer.valueOf(pF1.getText()) - 1;
+                chatPort = Integer.parseInt(pF1.getText());
+                gamePort = Integer.parseInt(pF1.getText()) - 1;
                 ip = ipF.getText();
 
                 NetworkConnection chatConnection = createChatClient(ip, chatPort);
@@ -211,17 +265,29 @@ public class Main extends Application {
                     ex.printStackTrace();
                 }
 
+                input.setOnKeyPressed(e2 -> {
+                    int value = 12;
+                    System.out.println("lol");
+                    try {
+                        gameConnection.send(12);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+
                 input.setOnAction(e2 -> {
                     String message = "Player2: ";
                     message += input.getText();
                     input.clear();
 
-                    messages.appendText(message + "\n");
+                    if (!message.equals("Player2: ")){
+                        messages.appendText(message + "\n");
 
-                    try {
-                        chatConnection.send(message);
-                    } catch (Exception ex) {
-                        messages.appendText("Failed to send\n");
+                        try {
+                            chatConnection.send(message);
+                        } catch (Exception ex) {
+                            messages.appendText("Failed to send\n");
+                        }
                     }
                 });
             });
@@ -249,7 +315,11 @@ public class Main extends Application {
     private Server createGameServer(int port) {
         return new Server(port, (data) -> {
             Platform.runLater(() -> {
-                handleOutputStream(data);
+                try {
+                    handleOutputStream(data);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             });
         });
     }
@@ -257,21 +327,23 @@ public class Main extends Application {
     private Client createGameClient(String ip, int port) {
         return new Client(ip, port, (data) -> {
             Platform.runLater(() -> {
-                handleOutputStream(data);
+                try {
+                    handleOutputStream(data);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             });
         });
     }
 
-    private void handleOutputStream(Serializable data){
+    private void handleOutputStream(Serializable data) throws InterruptedException {
         if (data instanceof String) {
-            System.out.println("You Win");
             game.endScreen(false);
         }
         if (data instanceof Integer[]){
             Integer[] xy = (Integer[]) data;
             game.playerBoard.getCell(xy[0], xy[1]).shoot();
             if (game.playerBoard.ships == 0) {
-                System.out.println("You Lose");
                 try {
                     String gameOver = "Game Over";
                     game.gameConn.send(gameOver);
@@ -280,6 +352,21 @@ public class Main extends Application {
                 } finally {
                     game.endScreen(true);
                 }
+            }
+        }
+        if (data instanceof Integer){
+            int value = (int) data;
+            if (value == 12){
+                typing.setText("Opponent is Typing......");
+                new java.util.Timer().schedule(
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                typing.setText("");
+                            }
+                        },
+                        1000
+                );
             }
         }
         if (data instanceof Boolean){
@@ -294,7 +381,7 @@ public class Main extends Application {
             game.enemyBoard = new Board(gridLayout, vertical, event ->{
                 if (game.isLocked && game.myTurn){
                     Cell cell = (Cell) event.getSource();
-                    if (cell.wasShot == false) {
+                    if (!cell.wasShot) {
                         cell.shoot();
                         game.myTurn = false;
                         try {
@@ -353,15 +440,15 @@ public class Main extends Application {
 
         Group gameBoard = game.playGame();
         gameBoard.setLayoutX(500);
-        gameBoard.setLayoutY(0);
+        gameBoard.setLayoutY(25);
         WinLoseText.setX(250);
         WinLoseText.setY(150);
 
         warning.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
 
         groupGame = new Group();
-        groupGame.getChildren().addAll(input, messages, gameBoard, WinLoseText);
-        gameScene = new Scene(groupGame, 1000, 700);
+        groupGame.getChildren().addAll(input, messages, gameBoard, WinLoseText, menuBar, typing);
+        gameScene = new Scene(groupGame, 1000, 705);
         stage.setScene(gameScene);
     }
 }

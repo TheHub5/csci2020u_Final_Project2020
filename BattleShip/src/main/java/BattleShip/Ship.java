@@ -24,6 +24,7 @@ public class Ship extends Parent {
 
     public void hit() {
         mediaPlayer.play();
+        System.out.println("Hit!!");
         health--;
     }
 
