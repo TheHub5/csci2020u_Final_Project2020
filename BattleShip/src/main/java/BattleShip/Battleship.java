@@ -1,6 +1,9 @@
 package BattleShip;
 
 import javafx.application.Platform;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 import javafx.geometry.Pos;
@@ -36,6 +39,7 @@ public class Battleship {
     }
 
     public Group playGame() throws Exception {
+        group = new Group();
         Button lockIn = new Button("Lock In");
         Button resetShips = new Button("Reset Ships");
         resetShips.setLayoutX(315);
@@ -57,7 +61,6 @@ public class Battleship {
             for (int i = 0; i < 10; i++){
                 for (int j = 0; j < 10; j++){
                     Cell c = playerBoard.getCell(j, i);
-                    c.ship = null;
                     c.setFill(Color.TRANSPARENT);
                     c.setStroke(Color.BLACK);
                 }
@@ -66,7 +69,12 @@ public class Battleship {
 
         lockIn.setOnAction(e -> {
             try {
-                if (shipsToPlace == 0 && gameConn.connThread.socket.isConnected()){
+                if (shipsToPlace > 0 && gameConn.connThread.socket.isConnected()){}
+            } catch (Exception ex){
+                messages.appendText("Place all five ships.\n");
+            }
+            try {
+                if (shipsToPlace == 0 && gameConn.connThread.socket.isConnected()) {
                     isLocked = true;
                     lockIn.setVisible(false);
                     resetShips.setVisible(false);
@@ -98,7 +106,7 @@ public class Battleship {
             }
         });
 
-        group = new Group(playerBoard.playerGrid, lockIn, resetShips);
+        group.getChildren().addAll(playerBoard.playerGrid, lockIn, resetShips);
         playerBoard.playerGrid.setLayoutX(0);
         playerBoard.playerGrid.setLayoutY(350);
         return group;
@@ -109,23 +117,25 @@ public class Battleship {
     public void endScreen(boolean won) {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
-        VBox popupVbox = new VBox(2);
+        Group group = new Group();
         Text gameOverMessage = new Text();
-        if (won) { gameOverMessage.setText("You Won"); }
-        else { gameOverMessage.setText("You Lost"); }
+
+        if (won) gameOverMessage.setText("You Won");
+        else gameOverMessage.setText("You Lost");
+
         Button restart = new Button("Play Again");
+        restart.setLayoutX(100);
+        restart.setLayoutY(100);
         Button exit = new Button("Exit");
-        HBox buttons = new HBox(2);
-        buttons.getChildren().add(restart);
-        buttons.getChildren().add(exit);
-        popupVbox.getChildren().add(gameOverMessage);
-        popupVbox.getChildren().add(buttons);
-        Scene popupScene = new Scene(popupVbox,300,200);
+        exit.setLayoutX(100);
+        exit.setLayoutY(150);
+
+        group.getChildren().addAll(gameOverMessage, restart, exit);
+        Scene popupScene = new Scene(group,300,200);
         popup.setScene(popupScene);
         popup.show();
 
         exit.setOnAction(e->{
-            //popup.close();
             Platform.exit();
         });
 

@@ -1,15 +1,20 @@
 package BattleShip;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
-import java.awt.*;
+import java.io.File;
 
 public class Cell extends Rectangle {
     public int x, y;
     public Ship ship = null;
     public boolean wasShot = false;
     private Board board;
+
+    private String blast = "src/main/resources/blast.aiff";
+    private Media sound = new Media(new File(blast).toURI().toString());
+    public MediaPlayer mediaPlayer = new MediaPlayer(sound);
 
     public Cell(int x, int y, Board board) {
         super(30, 30);
@@ -23,14 +28,24 @@ public class Cell extends Rectangle {
 
     public boolean shoot() {
         wasShot = true;
-
-        if (ship != null && ship.type != 0) {
-            ship.hit();
+        if (this.ship != null && this.ship.type != 0) {
+            mediaPlayer.play();
+//            if (this.ship.vertical) {
+//                for (int i = ship.y; i < ship.y + this.ship.type; i++) {
+//                    Cell cell = board.getCell(ship.x, i);
+//                    cell.ship.hit();
+//                }
+//            }
+//            else {
+//                for (int i = ship.x; i < ship.x + this.ship.type; i++) {
+//                    Cell cell = board.getCell(i, ship.y);
+//                    cell.ship.hit();
+//                }
+//            }
             setFill(Color.RED);
-            if (!ship.isAlive()) {
-                if(ship.type > 1)
-                    setShipSunkColor();
-                board.ships--;
+            if (!this.ship.isAlive()) {
+                setShipSunkColor();
+                this.board.ships--;
                 /*
                 if (ship.vertical) {
                     for (int i = ship.y; i < ship.y + ship.type; i++) {
@@ -54,16 +69,15 @@ public class Cell extends Rectangle {
 
     public void setShipSunkColor(){
         //loop through board, set all ships which have 0 health to dark red color
-        for(int x = 0;x<10;x++){
-            for(int y = 0;y<10;y++){
+        for(int x = 0; x < 10; x++){
+            for(int y = 0; y < 10; y++){
                 Cell c = board.getCell(x,y);
-                if(c.ship != null && c != null)
+                if(c.ship != null)
                 {
                     if(!c.ship.isAlive()){
                         c.setFill(Color.DARKRED);
                     }
                 }
-
             }
         }
     }

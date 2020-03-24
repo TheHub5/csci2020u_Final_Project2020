@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -15,31 +16,34 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+
+import java.io.DataOutputStream;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 
 import javafx.scene.control.Slider;
 
 public class Main extends Application {
-    MediaPlayer mediaplayer;
     public static void main(String[] args) {
         launch(args);
     }
 
-    private int chatPort, gamePort;
+    private MediaPlayer mediaplayer;
+    private long chatPort, gamePort;
     private String ip = "localhost";
     public static TextArea messages = new TextArea();
     private TextField input = new TextField();
-    private Text warning = new Text();
-    private Text WinLoseText = new Text();
     private static Text typing = new Text();
+    private Text invalidPort = new Text();
+    private Text invalid = new Text();
+    private Text turn = new Text();
     private Battleship game;
     private boolean[][] vertical = null;
     private MenuBar menuBar = new MenuBar();
-    private double volume = 0.03;
+    private double volume = 0.5;
 
     public Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
-    public Group groupGame;
+    public Group groupGame = new Group();
 
     @Override
     public void start(Stage stage) {
@@ -99,6 +103,7 @@ public class Main extends Application {
         gridJoin.add(pF1, 3, 13, 1, 1);
         gridJoin.add(JS, 3, 14, 1, 1);
         gridJoin.add(back, 1, 19, 1, 1);
+        gridJoin.add(invalid, 3, 11, 1, 1);
 
         GridPane gridCreate = new GridPane();
         gridCreate.setHgap(10);
@@ -111,6 +116,7 @@ public class Main extends Application {
         gridCreate.add(CS, 3, 13, 1, 1);
         gridCreate.add(text1, 2, 12, 1, 1);
         gridCreate.add(back1, 1, 21, 1, 1);
+        gridCreate.add(invalidPort, 3, 11, 1, 1);
 
         back.setOnAction(e -> {
             stage.setScene(start);
@@ -126,6 +132,13 @@ public class Main extends Application {
         text1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         text2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         typing.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
+        invalidPort.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
+        turn.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 40));
+        invalid.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
+
+        turn.setFill(Color.RED);
+        turn.setY(320);
+        turn.setX(540);
 
         gridJoin.setBackground(new Background(myBI));
         gridCreate.setBackground(new Background(myBI));
@@ -137,8 +150,6 @@ public class Main extends Application {
         input.setPrefWidth(480);
         input.setLayoutX(10);
         input.setLayoutY(665);
-        warning.setX(400);
-        warning.setY(350);
         typing.setX(15);
         typing.setY(658);
 
@@ -152,6 +163,10 @@ public class Main extends Application {
 
         menuFile.getItems().addAll(SettingM, ExitM);
         menuBar.getMenus().addAll(menuFile);
+
+        ExitM.setOnAction(e -> {
+            Platform.exit();
+        });
 
         SettingM.setOnAction(e -> {
             Stage settingPopUp = new Stage();
@@ -177,6 +192,7 @@ public class Main extends Application {
                 volume = slider.getValue();
                 mediaplayer.setVolume(volume);
                 txt1.setText(df.format(volume));
+                //Cell.mediaPlayer.setVolume(volume);
             });
 
             Group group = new Group(slider, txt, txt1);
@@ -187,15 +203,21 @@ public class Main extends Application {
 
         create.setOnAction(e -> {
             CS.setOnAction(e1 -> {
-                chatPort = Integer.parseInt(pF.getText());
-                gamePort = Integer.parseInt(pF.getText()) - 1;
+                try {
+                    chatPort = Long.parseLong(pF.getText());
+                    gamePort = Long.parseLong(pF.getText()) - 1;
+                } catch (Exception ex1){}
+
                 if (chatPort > 1 && chatPort < 65534) {
-                    NetworkConnection chatConnection = createChatServer(chatPort);
-                    NetworkConnection gameConnection = createGameServer(gamePort);
+                    int port = (int) chatPort;
+                    int port1 = (int) gamePort;
+                    NetworkConnection chatConnection = createChatServer(port);
+                    NetworkConnection gameConnection = createGameServer(port1);
                     mediaplayer.play();
                     messages.appendText("Entered room as Player 1" + "\n");
                     stage.setTitle("Battleship Player 1");
                     messages.appendText("Server running on port: " + chatPort + "\n");
+
                     try {
                         game(gameConnection, chatConnection, stage);
                         chatConnection.startConnection();
@@ -230,7 +252,7 @@ public class Main extends Application {
                         }
                     });
                 } else {
-                    System.out.println("Invalid Port!!!");
+                    invalidPort.setText("Invalid Port. Enter new Port.");
                 }
             });
             stage.setScene(createServer);
@@ -238,58 +260,66 @@ public class Main extends Application {
 
         join.setOnAction(e -> {
             JS.setOnAction(e1 -> {
-                chatPort = Integer.parseInt(pF1.getText());
-                gamePort = Integer.parseInt(pF1.getText()) - 1;
-                ip = ipF.getText();
-
-                NetworkConnection chatConnection = createChatClient(ip, chatPort);
-                NetworkConnection gameConnection = createGameClient(ip, gamePort);
-                messages.appendText("Entered room as Player 2" + "\n");
-                stage.setTitle("Battleship Player 2");
-                messages.appendText("Connected to: " + ip + ":" + chatPort + "\n");
-
                 try {
-                    game(gameConnection, chatConnection, stage);
-                    chatConnection.startConnection();
-                    gameConnection.startConnection();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                    chatPort = Long.parseLong(pF1.getText());
+                    gamePort = Long.parseLong(pF1.getText()) - 1;
+                    ip = ipF.getText();;
+                } catch (Exception ex1){}
 
-                try {
-                    Thread.sleep(100);
-                    if (chatConnection.connThread.socket.isConnected()){
-                        chatConnection.send("OPPONENT HAS CONNECTED!");
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                if (chatPort > 1 && chatPort < 65534) {
+                    int port = (int) chatPort;
+                    int port1 = (int) gamePort;
 
-                input.setOnKeyPressed(e2 -> {
-                    int value = 12;
-                    System.out.println("lol");
+                    NetworkConnection chatConnection = createChatClient(ip, port);
+                    NetworkConnection gameConnection = createGameClient(ip, port1);
+
                     try {
-                        gameConnection.send(12);
+                        game(gameConnection, chatConnection, stage);
+                        chatConnection.startConnection();
+                        gameConnection.startConnection();
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        invalid.setText("Invalid IP Address.");
                     }
-                });
 
-                input.setOnAction(e2 -> {
-                    String message = "Player2: ";
-                    message += input.getText();
-                    input.clear();
-
-                    if (!message.equals("Player2: ")){
-                        messages.appendText(message + "\n");
-
-                        try {
-                            chatConnection.send(message);
-                        } catch (Exception ex) {
-                            messages.appendText("Failed to send\n");
+                    try {
+                        Thread.sleep(100);
+                        if (chatConnection.connThread.socket.isConnected()) {
+                            chatConnection.send("OPPONENT HAS CONNECTED!");
+                            stage.setTitle("Battleship Player 1");
+                            messages.appendText("Entered room as Player 2" + "\n");
+                            messages.appendText("Connected to: " + ip + ": " + chatPort + "\n");
                         }
+                    } catch (Exception ex) {
+                        messages.appendText("UNABLE TO CONNECT TO SERVER\n");
                     }
-                });
+
+                    input.setOnKeyPressed(e2 -> {
+                        int value = 12;
+                        try {
+                            gameConnection.send(12);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+
+                    input.setOnAction(e2 -> {
+                        String message = "Player2: ";
+                        message += input.getText();
+                        input.clear();
+
+                        if (!message.equals("Player2: ")) {
+                            messages.appendText(message + "\n");
+
+                            try {
+                                chatConnection.send(message);
+                            } catch (Exception ex) {
+                                messages.appendText("Failed to send\n");
+                            }
+                        }
+                    });
+                } else {
+                    invalid.setText("Invalid Port or IP Address.");
+                }
             });
             stage.setScene(joinServer);
         });
@@ -365,18 +395,30 @@ public class Main extends Application {
                                 typing.setText("");
                             }
                         },
-                        1000
+                        1500
                 );
             }
         }
         if (data instanceof Boolean){
             game.myTurn = true;
+            turn.setText("YOUR TURN");
+            setCellsOpacity(1);
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            turn.setText("");
+                        }
+                    },
+                    2000
+            );
         }
         if (data instanceof boolean[][]){
             vertical = (boolean[][]) data;
         }
         if (data instanceof int[][] && vertical != null){
             int[][] gridLayout = (int[][]) data;
+            setAxis(groupGame);
 
             game.enemyBoard = new Board(gridLayout, vertical, event ->{
                 if (game.isLocked && game.myTurn){
@@ -384,6 +426,8 @@ public class Main extends Application {
                     if (!cell.wasShot) {
                         cell.shoot();
                         game.myTurn = false;
+                        turn.setText("");
+                        setCellsOpacity(0.5);
                         try {
                             Boolean a = true;
                             Integer[] xy = new Integer[2];
@@ -395,42 +439,12 @@ public class Main extends Application {
                             e.printStackTrace();
                         }
                     }
-                    //This does not work
-//                    if (!cell.ship.isAlive()) {
-//                        Ship ship = cell.ship;
-//                        if (ship.vertical) {
-//                            for (int i = ship.y; i < ship.y + ship.type; i++) {
-//                                game.enemyBoard.getCell(ship.x, i).setFill(Color.DARKRED);
-//                            }
-//                        } else {
-//                            for (int i = ship.x; i < ship.x + ship.type; i++) {
-//                                game.enemyBoard.getCell(i, ship.y).setFill(Color.DARKRED);
-//                            }
-//                        }
-//                    }
                 }
             });
 
             game.enemyBoard.playerGrid.setLayoutX(0);
             game.enemyBoard.playerGrid.setLayoutY(10);
             game.group.getChildren().add(game.enemyBoard.playerGrid);
-
-//                    for (int i = 0; i < 10; i++){
-//                        for (int j = 0; j < 10; j++){
-//                            System.out.print(game.enemyBoard.getCell(j, i).ship.type);
-//                        }
-//                        System.out.println();
-//                    }
-//
-//                    System.out.println();
-//                    System.out.println();
-//
-//                    for (int i = 0; i < 10; i++){
-//                        for (int j = 0; j < 10; j++){
-//                            System.out.print(game.enemyBoard.getCell(j, i).ship.vertical + " ");
-//                        }
-//                        System.out.println();
-//                    }
         }
     }
 
@@ -439,16 +453,57 @@ public class Main extends Application {
         game = new Battleship(gameConn, chatConn, messages);
 
         Group gameBoard = game.playGame();
-        gameBoard.setLayoutX(500);
+        gameBoard.setLayoutX(520);
         gameBoard.setLayoutY(25);
-        WinLoseText.setX(250);
-        WinLoseText.setY(150);
 
-        warning.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
+        int distance = 396;
+        int distance1 = 527;
+        for (int i = 0; i < 10; i++){
+            Text txt = new Text();
+            Text txt1 = new Text();
+            txt.setText(String.valueOf((char) ('A' + i)));
+            txt1.setText(String.valueOf(i + 1));
+            txt.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+            txt1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+            txt.setX(500);
+            txt.setY(distance);
+            txt1.setX(distance1);
+            txt1.setY(365);
+            distance += 31;
+            distance1 += 31;
+            groupGame.getChildren().addAll(txt, txt1);
+        }
 
-        groupGame = new Group();
-        groupGame.getChildren().addAll(input, messages, gameBoard, WinLoseText, menuBar, typing);
+        groupGame.getChildren().addAll(input, messages, gameBoard, menuBar, typing, turn);
         gameScene = new Scene(groupGame, 1000, 705);
         stage.setScene(gameScene);
+    }
+
+    private void setAxis(Group group){
+        int distance = 50;
+        int distance1 = 527;
+        for (int i = 0; i < 10; i++){
+            Text txt = new Text();
+            Text txt1 = new Text();
+            txt.setText(String.valueOf((char) ('A' + i)));
+            txt1.setText(String.valueOf(i + 1));
+            txt.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+            txt1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+            txt.setX(500);
+            txt.setY(distance);
+            txt1.setX(distance1);
+            txt1.setY(25);
+            distance += 31;
+            distance1 += 31;
+            group.getChildren().addAll(txt, txt1);
+        }
+    }
+
+    private void setCellsOpacity(double value){
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                game.enemyBoard.getCell(j, i).setOpacity(value);
+            }
+        }
     }
 }
