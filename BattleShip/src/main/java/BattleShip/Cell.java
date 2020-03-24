@@ -28,7 +28,8 @@ public class Cell extends Rectangle {
             ship.hit();
             setFill(Color.RED);
             if (!ship.isAlive()) {
-                setShipSunkColor();
+                if(ship.type > 1)
+                    setShipSunkColor();
                 board.ships--;
                 /*
                 if (ship.vertical) {
@@ -58,7 +59,7 @@ public class Cell extends Rectangle {
                 Cell c = board.getCell(x,y);
                 if(c.ship != null && c != null)
                 {
-                    if(c.ship.isAlive() == false){
+                    if(!c.ship.isAlive()){
                         c.setFill(Color.DARKRED);
                     }
                 }
