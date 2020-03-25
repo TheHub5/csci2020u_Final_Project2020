@@ -3,6 +3,8 @@ package BattleShip;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,10 +19,11 @@ import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javafx.scene.control.Slider;
 
@@ -49,7 +52,11 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         String song = "src/main/resources/epic.mp3";
+        String alert = "src/main/resources/alert.wav";
         Media musicfile = new Media (getClass().getClassLoader().getResource("epic.mp3").toExternalForm());
+        Media start_alert = new Media(new File(alert).toURI().toString());
+        MediaPlayer alertplayer = new MediaPlayer(start_alert);
+        alertplayer.setVolume(0.3);
         mediaplayer = new MediaPlayer(musicfile);
         mediaplayer.setVolume(volume);
         mediaplayer.setOnEndOfMedia(new Runnable() {
@@ -158,15 +165,40 @@ public class Main extends Application {
         EndScreen = new Scene(endScreen, 400, 400);
 
         Menu menuFile = new Menu("file");
-
+        MenuItem toTxt = new MenuItem("Save log as .txt file");
         MenuItem SettingM = new MenuItem("Setting");
         MenuItem ExitM = new MenuItem("Exit");
 
-        menuFile.getItems().addAll(SettingM, ExitM);
+        menuFile.getItems().addAll(SettingM,toTxt, ExitM);
         menuBar.getMenus().addAll(menuFile);
 
         ExitM.setOnAction(e -> {
             Platform.exit();
+        });
+
+        // Exports chat log to a .txt file
+        toTxt.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // Creates a file name for exporting based on date and time
+                DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
+                Date date = new Date();
+                String filename = "Log_" + dateFormat.format(date) + ".txt";
+                try
+                {
+                    //Creates a print writer, writes to the file, and closes the writer
+                    PrintWriter outputStream = new PrintWriter(filename);
+                    outputStream.print(messages.getText());
+                    outputStream.flush();
+                    outputStream.close();
+                    System.out.println("Export Complete");
+                }
+                catch (FileNotFoundException e)
+                {
+                    // Error handling
+                    e.printStackTrace();
+                }
+            }
         });
 
         SettingM.setOnAction(e -> {
@@ -215,6 +247,7 @@ public class Main extends Application {
                     NetworkConnection chatConnection = createChatServer(port);
                     NetworkConnection gameConnection = createGameServer(port1);
                     mediaplayer.play();
+                    alertplayer.play();
                     messages.appendText("Entered room as Player 1" + "\n");
                     stage.setTitle("Battleship Player 1");
                     messages.appendText("Server running on port: " + chatPort + "\n");
@@ -285,6 +318,7 @@ public class Main extends Application {
                         if (chatConnection.connThread.socket.isConnected()) {
                             chatConnection.send("OPPONENT HAS CONNECTED!");
                             stage.setTitle("Battleship Player 2");
+                            alertplayer.play();
                             messages.appendText("Entered room as Player 2" + "\n");
                             messages.appendText("Connected to: " + ip + ": " + chatPort + "\n");
                         }
@@ -321,6 +355,7 @@ public class Main extends Application {
             });
             stage.setScene(joinServer);
         });
+        stage.setTitle("Battleship");
         stage.show();
     }
 
