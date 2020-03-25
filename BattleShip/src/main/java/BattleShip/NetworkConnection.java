@@ -32,8 +32,8 @@ public abstract class NetworkConnection {
 
     public class ConnectionThread extends Thread {
         public Socket socket;
-        private ObjectOutputStream out;
-        private ObjectInputStream in;
+        public ObjectOutputStream out;
+        public ObjectInputStream in;
 
         @Override
         public void run(){

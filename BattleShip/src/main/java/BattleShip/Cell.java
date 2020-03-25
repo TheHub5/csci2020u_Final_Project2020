@@ -8,7 +8,7 @@ import java.io.File;
 
 public class Cell extends Rectangle {
     public int x, y;
-    public Ship ship = null;
+    public Ship ship;
     public boolean wasShot = false;
     private Board board;
 
@@ -16,67 +16,76 @@ public class Cell extends Rectangle {
     private Media sound = new Media(new File(blast).toURI().toString());
     public MediaPlayer mediaPlayer = new MediaPlayer(sound);
 
-    public Cell(int x, int y, Board board) {
+    public Cell(int x, int y, Board board, Ship ship) {
         super(30, 30);
         this.x = x;
         this.y = y;
         this.board = board;
+        this.ship = ship;
         setFill(Color.TRANSPARENT);
         setStroke(Color.BLACK);
         setOpacity(0.7);
     }
 
-    public boolean shoot() {
+    public boolean shoot(boolean isEnemy) {
         wasShot = true;
-        if (this.ship != null && this.ship.type != 0) {
+        if (ship != null && ship.type != 0) {
             mediaPlayer.play();
-//            if (this.ship.vertical) {
-//                for (int i = ship.y; i < ship.y + this.ship.type; i++) {
-//                    Cell cell = board.getCell(ship.x, i);
-//                    cell.ship.hit();
-//                }
-//            }
-//            else {
-//                for (int i = ship.x; i < ship.x + this.ship.type; i++) {
-//                    Cell cell = board.getCell(i, ship.y);
-//                    cell.ship.hit();
-//                }
-//            }
             setFill(Color.RED);
-            if (!this.ship.isAlive()) {
+            ship.hit();
+            if (!ship.isAlive()) {
                 setShipSunkColor();
                 this.board.ships--;
-                /*
-                if (ship.vertical) {
-                    for (int i = ship.y; i < ship.y + ship.type; i++) {
-                        board.getCell(ship.x, i).setFill(Color.DARKRED);
-                        System.out.println(board.getCell(ship.x, i).x + ", " + board.getCell(ship.x, i).y);
-                    }
-                } else {
-                    for (int i = ship.x; i < ship.x + ship.type; i++) {
-                        board.getCell(i, ship.y).setFill(Color.DARKRED);
-                        System.out.println(board.getCell(i, ship.y).x + ", " + board.getCell(i, ship.y).y);
-                    }
-                }
-                */
             }
             return true;
         } else setFill(Color.BLACK);
-
-
         return false;
     }
 
     public void setShipSunkColor(){
         //loop through board, set all ships which have 0 health to dark red color
-        for(int x = 0; x < 10; x++){
-            for(int y = 0; y < 10; y++){
+        for(int y = 0; y < 10; y++){
+            for(int x = 0; x < 10; x++){
                 Cell c = board.getCell(x,y);
                 if(c.ship != null)
                 {
-                    if(!c.ship.isAlive()){
+                    if(c.ship.health == 0){
                         c.setFill(Color.DARKRED);
                     }
+                }
+            }
+        }
+    }
+
+    public void hit(Cell cell) {
+        if (cell.ship != null && cell.ship.type != 0) {
+            if (cell.ship.vertical) {
+                int i = cell.y;
+                while (i < 10 && board.getCell(cell.x, i).ship != null) {
+                    Cell c = board.getCell(cell.x, i);
+                    System.out.println(c.x + ", " + c.y);
+                    c.ship.hit();
+                    i++;
+                }
+                i = cell.y - 1;
+                while (i > 0 && board.getCell(cell.x, i).ship != null) {
+                    Cell c = board.getCell(cell.x, i);
+                    System.out.println(c.x + ", " + c.y);
+                    c.ship.hit();
+                    i--;
+                }
+            } else {
+                int i = cell.x;
+                while (board.getCell(i, cell.y).ship != null) {
+                    Cell c = board.getCell(i, cell.y);
+                    c.ship.hit();
+                    i++;
+                }
+                i = cell.x - 1;
+                while (board.getCell(i, cell.y).ship != null) {
+                    Cell c = board.getCell(i, cell.y);
+                    c.ship.hit();
+                    i--;
                 }
             }
         }

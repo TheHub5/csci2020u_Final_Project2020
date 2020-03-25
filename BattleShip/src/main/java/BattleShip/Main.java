@@ -18,6 +18,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 
@@ -40,7 +41,7 @@ public class Main extends Application {
     private Battleship game;
     private boolean[][] vertical = null;
     private MenuBar menuBar = new MenuBar();
-    private double volume = 0.5;
+    private double volume = 0.01;
 
     public Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
     public Group groupGame = new Group();
@@ -125,8 +126,8 @@ public class Main extends Application {
             stage.setScene(start);
         });
 
-        createServer = new Scene(gridCreate, 400, 300);
-        joinServer = new Scene(gridJoin, 400, 300);
+        createServer = new Scene(gridCreate, 400, 320);
+        joinServer = new Scene(gridJoin, 400, 320);
 
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         text1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
@@ -227,12 +228,10 @@ public class Main extends Application {
                     }
 
                     input.setOnKeyPressed(e2 -> {
-                        int value = 12;
-                        System.out.println("lol");
                         try {
                             gameConnection.send(12);
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            input.setEditable(false);
                         }
                     });
 
@@ -285,7 +284,7 @@ public class Main extends Application {
                         Thread.sleep(100);
                         if (chatConnection.connThread.socket.isConnected()) {
                             chatConnection.send("OPPONENT HAS CONNECTED!");
-                            stage.setTitle("Battleship Player 1");
+                            stage.setTitle("Battleship Player 2");
                             messages.appendText("Entered room as Player 2" + "\n");
                             messages.appendText("Connected to: " + ip + ": " + chatPort + "\n");
                         }
@@ -294,11 +293,10 @@ public class Main extends Application {
                     }
 
                     input.setOnKeyPressed(e2 -> {
-                        int value = 12;
                         try {
                             gameConnection.send(12);
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            input.setEditable(false);
                         }
                     });
 
@@ -329,6 +327,7 @@ public class Main extends Application {
     private Server createChatServer(int port) {
         return new Server(port, (data) -> {
             Platform.runLater(() -> {
+                input.setEditable(true);
                 messages.appendText(data.toString() + "\n");
             });
         });
@@ -347,7 +346,7 @@ public class Main extends Application {
             Platform.runLater(() -> {
                 try {
                     handleOutputStream(data);
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
@@ -359,28 +358,34 @@ public class Main extends Application {
             Platform.runLater(() -> {
                 try {
                     handleOutputStream(data);
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
         });
     }
 
-    private void handleOutputStream(Serializable data) throws InterruptedException {
+    private void handleOutputStream(Serializable data) throws Exception {
         if (data instanceof String) {
-            game.endScreen(false);
+            try {
+                game.chatConn.send("");
+                game.endScreen(true, false);
+            } catch (Exception e){
+                game.endScreen(true, true);
+            }
         }
         if (data instanceof Integer[]){
             Integer[] xy = (Integer[]) data;
-            game.playerBoard.getCell(xy[0], xy[1]).shoot();
-            if (game.playerBoard.ships == 0) {
+            game.playerBoard.getCell(xy[0], xy[1]).shoot(false);
+            if (game.playerBoard.getCell(xy[0], xy[1]).ship != null && !game.playerBoard.getCell(xy[0], xy[1]).ship.isAlive()) {
+                game.chatConn.send("You have sunk a ship!");
+            }
+            if (game.playerBoard.checkWin()) {
                 try {
-                    String gameOver = "Game Over";
-                    game.gameConn.send(gameOver);
+                    game.gameConn.send("");
+                    game.endScreen(false, false);
                 } catch (Exception e) {
                     System.out.println("Error");
-                } finally {
-                    game.endScreen(true);
                 }
             }
         }
@@ -401,17 +406,17 @@ public class Main extends Application {
         }
         if (data instanceof Boolean){
             game.myTurn = true;
-            turn.setText("YOUR TURN");
             setCellsOpacity(1);
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            turn.setText("");
-                        }
-                    },
-                    2000
-            );
+//            turn.setText("YOUR TURN");
+//            new java.util.Timer().schedule(
+//                    new java.util.TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            turn.setText("");
+//                        }
+//                    },
+//                    2000
+//            );
         }
         if (data instanceof boolean[][]){
             vertical = (boolean[][]) data;
@@ -424,7 +429,7 @@ public class Main extends Application {
                 if (game.isLocked && game.myTurn){
                     Cell cell = (Cell) event.getSource();
                     if (!cell.wasShot) {
-                        cell.shoot();
+                        cell.shoot(true);
                         game.myTurn = false;
                         turn.setText("");
                         setCellsOpacity(0.5);
@@ -505,5 +510,20 @@ public class Main extends Application {
                 game.enemyBoard.getCell(j, i).setOpacity(value);
             }
         }
+    }
+
+    private void print(){
+        for(int y = 0; y < 10; y++){
+            for(int x = 0; x < 10; x++){
+                Cell c = game.enemyBoard.getCell(x,y);
+                if (c.ship != null){
+                    System.out.print(c.ship.health);
+                } else {
+                    System.out.print(0);
+                }
+            }
+            System.out.println();
+        }
+        System.out.println("\n");
     }
 }

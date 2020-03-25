@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 public class Board {
     VBox playerGrid = new VBox();
     public int ships = 5;
+    public Ship shipList[] = new Ship[5];
 
     BackgroundImage water = new BackgroundImage(new Image("images/water.jpg",400,400,false,true),
             BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
@@ -23,7 +24,7 @@ public class Board {
         for (int y = 0; y < 10; y++) {
             HBox row = new HBox();
             for (int x = 0; x < 10; x++) {
-                Cell c = new Cell(x, y, this);
+                Cell c = new Cell(x, y, this, null);
                 c.setOnMouseClicked(handler);
                 row.getChildren().add(c);
             }
@@ -34,13 +35,42 @@ public class Board {
 
     public Board(int[][] gridLayout, boolean[][] vertical, EventHandler<? super MouseEvent> handler) {
         playerGrid.getChildren().clear();
+        for (int y = 0; y < 5; y++){
+            shipList[y] = new Ship(y + 1, true);
+        }
         for (int y = 0; y < 10; y++){
             HBox row = new HBox();
             for (int x = 0; x < 10; x++){
-                Cell c = new Cell(x, y, this);
+                Ship s = new Ship(0, true);
+                switch(gridLayout[x][y]) {
+                    case 1:
+                        shipList[0].vertical = vertical[x][y];
+                        s = shipList[0];
+                        break;
+                    case 2:
+                        shipList[1].vertical = vertical[x][y];
+                        s = shipList[1];
+                        break;
+                    case 3:
+                        shipList[2].vertical = vertical[x][y];
+                        s = shipList[2];
+                        break;
+                    case 4:
+                        shipList[3].vertical = vertical[x][y];
+                        s = shipList[3];
+                        break;
+                    case 5:
+                        shipList[4].vertical = vertical[x][y];
+                        s = shipList[4];
+                        break;
+                    default:
+                        s = null;
+                }
+                Cell c = new Cell(x, y, this, s);
+                if (gridLayout[x][y] == 0) {
+                    c.ship = null;
+                }
                 c.setOnMouseClicked(handler);
-                Ship s = new Ship(gridLayout[x][y], vertical[x][y]);
-                c.ship = s;
                 row.getChildren().add(c);
             }
             playerGrid.setBackground(new Background(water));

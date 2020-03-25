@@ -1,6 +1,8 @@
 package BattleShip;
 
 import javafx.application.Platform;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -12,9 +14,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -69,11 +68,9 @@ public class Battleship {
 
         lockIn.setOnAction(e -> {
             try {
-                if (shipsToPlace > 0 && gameConn.connThread.socket.isConnected()){}
-            } catch (Exception ex){
-                messages.appendText("Place all five ships.\n");
-            }
-            try {
+                if (shipsToPlace > 0 && gameConn.connThread.socket.isConnected()){
+                    messages.appendText("Place all five ships.\n");
+                }
                 if (shipsToPlace == 0 && gameConn.connThread.socket.isConnected()) {
                     isLocked = true;
                     lockIn.setVisible(false);
@@ -114,24 +111,51 @@ public class Battleship {
 
     public Board getBoard(){return playerBoard;}
 
-    public void endScreen(boolean won) {
+    public void endScreen(boolean won, boolean disc) {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
-        Group group = new Group();
+        GridPane grid = new GridPane();
         Text gameOverMessage = new Text();
+        Text discM = new Text();
+        gameOverMessage.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
+        discM.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
 
-        if (won) gameOverMessage.setText("You Won");
-        else gameOverMessage.setText("You Lost");
+        BackgroundImage wonI = new BackgroundImage(new Image("images/Won.png",400,200,false,true),
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
+        BackgroundImage lostI = new BackgroundImage(new Image("images/Lost.jpg",400,200,false,true),
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
+        if (won && !disc){
+            gameOverMessage.setText("You Won");
+            grid.setBackground(new Background(wonI));
+            grid.add(gameOverMessage, 15, 1, 1, 1);
+        }
+        else if (!disc) {
+            gameOverMessage.setText("You Lost");
+            grid.setBackground(new Background(lostI));
+            grid.add(gameOverMessage, 15, 1, 1, 1);
+        }
+        else {
+            grid.add(discM, 15, 1, 1, 1);
+            discM.setText("Opponent Disconnected\n");
+        }
 
         Button restart = new Button("Play Again");
-        restart.setLayoutX(100);
-        restart.setLayoutY(100);
+        restart.setScaleX(1.2);
+        restart.setScaleY(1.2);
         Button exit = new Button("Exit");
-        exit.setLayoutX(100);
-        exit.setLayoutY(150);
+        exit.setScaleX(1.2);
+        exit.setScaleY(1.2);
+//        Button back = new Button("RETURN TO MAIN MENU");
+//        back.setPrefWidth(150);
 
-        group.getChildren().addAll(gameOverMessage, restart, exit);
-        Scene popupScene = new Scene(group,300,200);
+
+
+        grid.add(exit, 15, 5, 1, 1);
+        Scene popupScene = new Scene(grid,300,200);
         popup.setScene(popupScene);
         popup.show();
 
