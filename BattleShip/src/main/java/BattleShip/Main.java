@@ -53,7 +53,7 @@ public class Main extends Application {
         Media musicfile = new Media (Objects.requireNonNull(getClass().getClassLoader().getResource("epic.mp3")).toExternalForm());
         Media start_alert = new Media(new File(alert).toURI().toString());
         MediaPlayer alertplayer = new MediaPlayer(start_alert);
-        alertplayer.setVolume(0.3);
+        alertplayer.setVolume(0.2);
         mediaplayer = new MediaPlayer(musicfile);
         mediaplayer.setVolume(volume);
         mediaplayer.setOnEndOfMedia(new Runnable() {
@@ -212,6 +212,7 @@ public class Main extends Application {
             slider.setOnMouseDragged(e1 -> {
                 volume = slider.getValue();
                 mediaplayer.setVolume(volume);
+                alertplayer.setVolume(volume);
                 txt1.setText(df.format(volume));
                 for(int y = 0; y < 10; y++){
                     for(int x = 0; x < 10; x++){
@@ -240,7 +241,6 @@ public class Main extends Application {
                     NetworkConnection chatConnection = createChatServer(port);
                     NetworkConnection gameConnection = createGameServer(port1);
                     mediaplayer.play();
-                    alertplayer.play();
                     messages.appendText("Entered room as Player 1" + "\n");
                     stage.setTitle("Battleship Player 1");
                     messages.appendText("Server running on port: " + chatPort + "\n" + "Waiting for Opponent to Connect....\n");
@@ -297,6 +297,7 @@ public class Main extends Application {
 
                     NetworkConnection chatConnection = createChatClient(ip, port);
                     NetworkConnection gameConnection = createGameClient(ip, port1);
+                    mediaplayer.play();
 
                     try {
                         game(gameConnection, chatConnection, stage);
