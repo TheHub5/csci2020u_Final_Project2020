@@ -25,6 +25,7 @@ public class Cell extends Rectangle {
         setFill(Color.TRANSPARENT);
         setStroke(Color.BLACK);
         setOpacity(0.7);
+        mediaPlayer.setVolume(0.01);
     }
 
     public boolean shoot(boolean isEnemy) {

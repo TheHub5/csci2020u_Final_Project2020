@@ -1,10 +1,6 @@
 package BattleShip;
 
 import javafx.scene.Parent;
-import javafx.scene.media.Media;
-import java.io.File;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
 
 public class Ship extends Parent {
 

@@ -8,17 +8,13 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-
-import java.io.Serializable;
 
 public class Battleship {
 
@@ -62,6 +58,7 @@ public class Battleship {
                     Cell c = playerBoard.getCell(j, i);
                     c.setFill(Color.TRANSPARENT);
                     c.setStroke(Color.BLACK);
+                    c.ship = null;
                 }
             }
         });
@@ -128,34 +125,35 @@ public class Battleship {
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
 
+        Button exit = new Button("Exit");
+        exit.setScaleX(1.2);
+        exit.setScaleY(1.2);
+
         if (won && !disc){
             gameOverMessage.setText("You Won");
             grid.setBackground(new Background(wonI));
-            grid.add(gameOverMessage, 15, 1, 1, 1);
-        }
-        else if (!disc) {
+            grid.add(gameOverMessage, 15, 13, 1, 1);
+            grid.add(exit, 15, 1, 1, 1);
+        } else if (!disc) {
             gameOverMessage.setText("You Lost");
             grid.setBackground(new Background(lostI));
             grid.add(gameOverMessage, 15, 1, 1, 1);
-        }
-        else {
-            grid.add(discM, 15, 1, 1, 1);
+            grid.add(exit, 17, 3, 1, 1);
+        } else {
+            grid.add(discM, 3, 1, 1, 1);
             discM.setText("Opponent Disconnected\n");
         }
 
         Button restart = new Button("Play Again");
         restart.setScaleX(1.2);
         restart.setScaleY(1.2);
-        Button exit = new Button("Exit");
-        exit.setScaleX(1.2);
-        exit.setScaleY(1.2);
 //        Button back = new Button("RETURN TO MAIN MENU");
 //        back.setPrefWidth(150);
 
+        grid.setHgap(10);
+        grid.setVgap(10);
 
-
-        grid.add(exit, 15, 5, 1, 1);
-        Scene popupScene = new Scene(grid,300,200);
+        Scene popupScene = new Scene(grid,300,250);
         popup.setScene(popupScene);
         popup.show();
 

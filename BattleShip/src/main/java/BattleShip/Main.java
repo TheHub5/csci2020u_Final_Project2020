@@ -2,7 +2,6 @@ package BattleShip;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,10 +16,10 @@ import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javafx.scene.control.Slider;
 
@@ -171,6 +170,7 @@ public class Main extends Application {
 
         SettingM.setOnAction(e -> {
             Stage settingPopUp = new Stage();
+            settingPopUp.setTitle("Settings");
 
             Text txt = new Text("Volume");
             txt.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 13));
@@ -193,7 +193,12 @@ public class Main extends Application {
                 volume = slider.getValue();
                 mediaplayer.setVolume(volume);
                 txt1.setText(df.format(volume));
-                //Cell.mediaPlayer.setVolume(volume);
+                for(int y = 0; y < 10; y++){
+                    for(int x = 0; x < 10; x++){
+                        game.enemyBoard.getCell(x, y).mediaPlayer.setVolume(volume);
+                        game.playerBoard.getCell(x, y).mediaPlayer.setVolume(volume);
+                    }
+                }
             });
 
             Group group = new Group(slider, txt, txt1);
@@ -207,7 +212,7 @@ public class Main extends Application {
                 try {
                     chatPort = Long.parseLong(pF.getText());
                     gamePort = Long.parseLong(pF.getText()) - 1;
-                } catch (Exception ex1){}
+                } catch (Exception ignored){}
 
                 if (chatPort > 1 && chatPort < 65534) {
                     int port = (int) chatPort;
@@ -217,7 +222,7 @@ public class Main extends Application {
                     mediaplayer.play();
                     messages.appendText("Entered room as Player 1" + "\n");
                     stage.setTitle("Battleship Player 1");
-                    messages.appendText("Server running on port: " + chatPort + "\n");
+                    messages.appendText("Server running on port: " + chatPort + "\n" + "Waiting for Opponent to Connect....\n");
 
                     try {
                         game(gameConnection, chatConnection, stage);
@@ -263,7 +268,7 @@ public class Main extends Application {
                     chatPort = Long.parseLong(pF1.getText());
                     gamePort = Long.parseLong(pF1.getText()) - 1;
                     ip = ipF.getText();;
-                } catch (Exception ex1){}
+                } catch (Exception ignored){}
 
                 if (chatPort > 1 && chatPort < 65534) {
                     int port = (int) chatPort;
@@ -372,6 +377,19 @@ public class Main extends Application {
                 game.endScreen(true, false);
             } catch (Exception e){
                 game.endScreen(true, true);
+                new java.util.Timer().schedule(
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                messages.appendText("OPPONENT HAS DISCONNECTED!\n");
+                            }
+                        },
+                        500
+                );
+                SimpleDateFormat formatter = new SimpleDateFormat("dd,MM,yyyy HH;mm;ss");
+                Date date = new Date();
+                String file = "src/main/Logs/Date " + formatter.format(date) + ".txt";
+                writeLog(file);
             }
         }
         if (data instanceof Integer[]){
@@ -525,5 +543,21 @@ public class Main extends Application {
             System.out.println();
         }
         System.out.println("\n");
+    }
+
+    public void writeLog(String file) throws Exception {
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-16");
+            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+
+            String text = messages.getText();
+            bufferedWriter.write(text);
+
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
