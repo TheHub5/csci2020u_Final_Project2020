@@ -33,7 +33,7 @@ public class Battleship {
         this.messages = messages;
     }
 
-    public Group playGame() throws Exception {
+    public Group playGame() {
         group = new Group();
         Button lockIn = new Button("Lock In");
         Button resetShips = new Button("Reset Ships");
@@ -106,8 +106,6 @@ public class Battleship {
         return group;
     }
 
-    public Board getBoard(){return playerBoard;}
-
     public void endScreen(boolean won, boolean disc) {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
@@ -147,8 +145,6 @@ public class Battleship {
         Button restart = new Button("Play Again");
         restart.setScaleX(1.2);
         restart.setScaleY(1.2);
-//        Button back = new Button("RETURN TO MAIN MENU");
-//        back.setPrefWidth(150);
 
         grid.setHgap(10);
         grid.setVgap(10);

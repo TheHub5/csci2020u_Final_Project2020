@@ -28,7 +28,7 @@ public class Cell extends Rectangle {
         mediaPlayer.setVolume(0.01);
     }
 
-    public boolean shoot(boolean isEnemy) {
+    public void shoot() {
         wasShot = true;
         if (ship != null && ship.type != 0) {
             mediaPlayer.play();
@@ -38,9 +38,7 @@ public class Cell extends Rectangle {
                 setShipSunkColor();
                 this.board.ships--;
             }
-            return true;
         } else setFill(Color.BLACK);
-        return false;
     }
 
     public void setShipSunkColor(){
@@ -53,40 +51,6 @@ public class Cell extends Rectangle {
                     if(c.ship.health == 0){
                         c.setFill(Color.DARKRED);
                     }
-                }
-            }
-        }
-    }
-
-    public void hit(Cell cell) {
-        if (cell.ship != null && cell.ship.type != 0) {
-            if (cell.ship.vertical) {
-                int i = cell.y;
-                while (i < 10 && board.getCell(cell.x, i).ship != null) {
-                    Cell c = board.getCell(cell.x, i);
-                    System.out.println(c.x + ", " + c.y);
-                    c.ship.hit();
-                    i++;
-                }
-                i = cell.y - 1;
-                while (i > 0 && board.getCell(cell.x, i).ship != null) {
-                    Cell c = board.getCell(cell.x, i);
-                    System.out.println(c.x + ", " + c.y);
-                    c.ship.hit();
-                    i--;
-                }
-            } else {
-                int i = cell.x;
-                while (board.getCell(i, cell.y).ship != null) {
-                    Cell c = board.getCell(i, cell.y);
-                    c.ship.hit();
-                    i++;
-                }
-                i = cell.x - 1;
-                while (board.getCell(i, cell.y).ship != null) {
-                    Cell c = board.getCell(i, cell.y);
-                    c.ship.hit();
-                    i--;
                 }
             }
         }

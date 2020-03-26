@@ -13,7 +13,7 @@ import javafx.scene.paint.Color;
 public class Board {
     VBox playerGrid = new VBox();
     public int ships = 5;
-    public Ship shipList[] = new Ship[5];
+    public Ship[] shipList = new Ship[5];
 
     BackgroundImage water = new BackgroundImage(new Image("images/water.jpg",400,400,false,true),
             BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
@@ -78,8 +78,7 @@ public class Board {
     }
 
     public boolean checkWin(){
-        if (this.ships == 0) return true;
-        else return false;
+        return this.ships == 0;
     }
 
     public boolean placeShip(Ship ship, int x, int y) {
@@ -106,7 +105,6 @@ public class Board {
             }
             return true;
         }
-
         return false;
     }
 
@@ -129,7 +127,6 @@ public class Board {
                 neighbors.add(getCell((int)p.getX(), (int)p.getY()));
             }
         }
-
         return neighbors.toArray(new Cell[0]);
     }
 
@@ -172,7 +169,6 @@ public class Board {
                 }
             }
         }
-
         return true;
     }
 

@@ -2,12 +2,13 @@ package BattleShip;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -15,11 +16,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-
 import java.io.*;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import javafx.scene.control.Slider;
 
@@ -36,11 +38,10 @@ public class Main extends Application {
     private static Text typing = new Text();
     private Text invalidPort = new Text();
     private Text invalid = new Text();
-    private Text turn = new Text();
     private Battleship game;
     private boolean[][] vertical = null;
     private MenuBar menuBar = new MenuBar();
-    private double volume = 0.01;
+    private double volume = 0.02;
 
     public Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
     public Group groupGame = new Group();
@@ -48,7 +49,11 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         String song = "src/main/resources/epic.mp3";
-        Media musicfile = new Media (getClass().getClassLoader().getResource("epic.mp3").toExternalForm());
+        String alert = "src/main/resources/alert.wav";
+        Media musicfile = new Media (Objects.requireNonNull(getClass().getClassLoader().getResource("epic.mp3")).toExternalForm());
+        Media start_alert = new Media(new File(alert).toURI().toString());
+        MediaPlayer alertplayer = new MediaPlayer(start_alert);
+        alertplayer.setVolume(0.3);
         mediaplayer = new MediaPlayer(musicfile);
         mediaplayer.setVolume(volume);
         mediaplayer.setOnEndOfMedia(new Runnable() {
@@ -64,11 +69,7 @@ public class Main extends Application {
         start = new Scene(gridStart, 400, 400);
         stage.setScene(start);
 
-        BackgroundImage myBI= new BackgroundImage(new Image("images/image1.jpg",400,400,false,true),
-                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
-
-        BackgroundImage gameBI= new BackgroundImage(new Image("images/grass.jpg",1000,700,false,true),
+        BackgroundImage myBI = new BackgroundImage(new Image("images/image1.jpg",400,400,false,true),
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
 
@@ -79,7 +80,6 @@ public class Main extends Application {
         Button create = new Button("Create Server");
         Button join = new Button("Join Server");
 
-        create.setStyle("-fx-background-color: black");
         create.setStyle("-fx-font-size: 2em; ");
         join.setStyle("-fx-font-size: 2em; ");
 
@@ -133,12 +133,7 @@ public class Main extends Application {
         text2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         typing.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         invalidPort.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
-        turn.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 40));
         invalid.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
-
-        turn.setFill(Color.RED);
-        turn.setY(320);
-        turn.setX(540);
 
         gridJoin.setBackground(new Background(myBI));
         gridCreate.setBackground(new Background(myBI));
@@ -157,15 +152,40 @@ public class Main extends Application {
         EndScreen = new Scene(endScreen, 400, 400);
 
         Menu menuFile = new Menu("file");
-
+        MenuItem toTxt = new MenuItem("Save log as .txt file");
         MenuItem SettingM = new MenuItem("Setting");
         MenuItem ExitM = new MenuItem("Exit");
 
-        menuFile.getItems().addAll(SettingM, ExitM);
+        menuFile.getItems().addAll(SettingM,toTxt, ExitM);
         menuBar.getMenus().addAll(menuFile);
 
         ExitM.setOnAction(e -> {
             Platform.exit();
+        });
+
+        // Exports chat log to a .txt file
+        toTxt.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // Creates a file name for exporting based on date and time
+                DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
+                Date date = new Date();
+                String filename = "src/main/Logs/Log_" + dateFormat.format(date) + ".txt";
+                try
+                {
+                    //Creates a print writer, writes to the file, and closes the writer
+                    PrintWriter outputStream = new PrintWriter(filename);
+                    outputStream.print(messages.getText());
+                    outputStream.flush();
+                    outputStream.close();
+                    System.out.println("Export Complete");
+                }
+                catch (FileNotFoundException e)
+                {
+                    // Error handling
+                    e.printStackTrace();
+                }
+            }
         });
 
         SettingM.setOnAction(e -> {
@@ -220,6 +240,7 @@ public class Main extends Application {
                     NetworkConnection chatConnection = createChatServer(port);
                     NetworkConnection gameConnection = createGameServer(port1);
                     mediaplayer.play();
+                    alertplayer.play();
                     messages.appendText("Entered room as Player 1" + "\n");
                     stage.setTitle("Battleship Player 1");
                     messages.appendText("Server running on port: " + chatPort + "\n" + "Waiting for Opponent to Connect....\n");
@@ -290,6 +311,7 @@ public class Main extends Application {
                         if (chatConnection.connThread.socket.isConnected()) {
                             chatConnection.send("OPPONENT HAS CONNECTED!");
                             stage.setTitle("Battleship Player 2");
+                            alertplayer.play();
                             messages.appendText("Entered room as Player 2" + "\n");
                             messages.appendText("Connected to: " + ip + ": " + chatPort + "\n");
                         }
@@ -326,6 +348,7 @@ public class Main extends Application {
             });
             stage.setScene(joinServer);
         });
+        stage.setTitle("Battleship");
         stage.show();
     }
 
@@ -386,15 +409,11 @@ public class Main extends Application {
                         },
                         500
                 );
-                SimpleDateFormat formatter = new SimpleDateFormat("dd,MM,yyyy HH;mm;ss");
-                Date date = new Date();
-                String file = "src/main/Logs/Date " + formatter.format(date) + ".txt";
-                writeLog(file);
             }
         }
         if (data instanceof Integer[]){
             Integer[] xy = (Integer[]) data;
-            game.playerBoard.getCell(xy[0], xy[1]).shoot(false);
+            game.playerBoard.getCell(xy[0], xy[1]).shoot();
             if (game.playerBoard.getCell(xy[0], xy[1]).ship != null && !game.playerBoard.getCell(xy[0], xy[1]).ship.isAlive()) {
                 game.chatConn.send("You have sunk a ship!");
             }
@@ -425,16 +444,6 @@ public class Main extends Application {
         if (data instanceof Boolean){
             game.myTurn = true;
             setCellsOpacity(1);
-//            turn.setText("YOUR TURN");
-//            new java.util.Timer().schedule(
-//                    new java.util.TimerTask() {
-//                        @Override
-//                        public void run() {
-//                            turn.setText("");
-//                        }
-//                    },
-//                    2000
-//            );
         }
         if (data instanceof boolean[][]){
             vertical = (boolean[][]) data;
@@ -447,9 +456,8 @@ public class Main extends Application {
                 if (game.isLocked && game.myTurn){
                     Cell cell = (Cell) event.getSource();
                     if (!cell.wasShot) {
-                        cell.shoot(true);
+                        cell.shoot();
                         game.myTurn = false;
-                        turn.setText("");
                         setCellsOpacity(0.5);
                         try {
                             Boolean a = true;
@@ -497,7 +505,7 @@ public class Main extends Application {
             groupGame.getChildren().addAll(txt, txt1);
         }
 
-        groupGame.getChildren().addAll(input, messages, gameBoard, menuBar, typing, turn);
+        groupGame.getChildren().addAll(input, messages, gameBoard, menuBar, typing);
         gameScene = new Scene(groupGame, 1000, 705);
         stage.setScene(gameScene);
     }
@@ -530,6 +538,7 @@ public class Main extends Application {
         }
     }
 
+    //Print enemy's board ship health
     private void print(){
         for(int y = 0; y < 10; y++){
             for(int x = 0; x < 10; x++){
@@ -543,21 +552,5 @@ public class Main extends Application {
             System.out.println();
         }
         System.out.println("\n");
-    }
-
-    public void writeLog(String file) throws Exception {
-        try {
-            FileOutputStream outputStream = new FileOutputStream(file);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-16");
-            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-
-            String text = messages.getText();
-            bufferedWriter.write(text);
-
-            bufferedWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 }
