@@ -41,7 +41,7 @@ public class Main extends Application {
     private Battleship game;
     private boolean[][] vertical = null;
     private MenuBar menuBar = new MenuBar();
-    private double volume = 0.02;
+    public static double volume = 0.2;
 
     public Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
     public Group groupGame = new Group();
@@ -53,7 +53,7 @@ public class Main extends Application {
         Media musicfile = new Media (Objects.requireNonNull(getClass().getClassLoader().getResource("epic.mp3")).toExternalForm());
         Media start_alert = new Media(new File(alert).toURI().toString());
         MediaPlayer alertplayer = new MediaPlayer(start_alert);
-        alertplayer.setVolume(0.3);
+        alertplayer.setVolume(volume*10);
         mediaplayer = new MediaPlayer(musicfile);
         mediaplayer.setVolume(volume);
         mediaplayer.setOnEndOfMedia(new Runnable() {
@@ -151,7 +151,7 @@ public class Main extends Application {
         Group endScreen = new Group();
         EndScreen = new Scene(endScreen, 400, 400);
 
-        Menu menuFile = new Menu("file");
+        Menu menuFile = new Menu("File");
         MenuItem toTxt = new MenuItem("Save log as .txt file");
         MenuItem SettingM = new MenuItem("Setting");
         MenuItem ExitM = new MenuItem("Exit");
@@ -211,6 +211,7 @@ public class Main extends Application {
             slider.setValue(volume);
             slider.setOnMouseDragged(e1 -> {
                 volume = slider.getValue();
+                alertplayer.setVolume((volume)*15);
                 mediaplayer.setVolume(volume);
                 txt1.setText(df.format(volume));
                 for(int y = 0; y < 10; y++){
