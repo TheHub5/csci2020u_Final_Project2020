@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -24,27 +25,38 @@ import java.util.Date;
 import java.util.Objects;
 
 import javafx.scene.control.Slider;
+import javafx.util.Duration;
 
 public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
 
+    //Ii
     private MediaPlayer mediaplayer;
     private long chatPort, gamePort;
     private String ip = "localhost";
     public static TextArea messages = new TextArea();
-    private TextField input = new TextField();
+    private static TextField input = new TextField();
     private static Text typing = new Text();
     private Text invalidPort = new Text();
     private Text invalid = new Text();
-    private Battleship game;
+    private static Battleship game;
     private boolean[][] vertical = null;
-    private MenuBar menuBar = new MenuBar();
-    private double volume = 0.02;
+    private static MenuBar menuBar = new MenuBar();
+    public static double volume = 0.05;
+    public static double multiplier = 10;
 
-    public Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
-    public Group groupGame = new Group();
+    public static Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
+    public static Group groupGame = new Group();
+
+    public static BackgroundImage myBI = new BackgroundImage(new Image("images/image1.jpg",400,400,false,true),
+            BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+            BackgroundSize.DEFAULT);
+
+    public static BackgroundImage gameBI = new BackgroundImage(new Image("images/BattleShipBackground.jpg",1000,705,false,true),
+            BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+            BackgroundSize.DEFAULT);
 
     @Override
     public void start(Stage stage) {
@@ -53,12 +65,13 @@ public class Main extends Application {
         Media musicfile = new Media (Objects.requireNonNull(getClass().getClassLoader().getResource("epic.mp3")).toExternalForm());
         Media start_alert = new Media(new File(alert).toURI().toString());
         MediaPlayer alertplayer = new MediaPlayer(start_alert);
-        alertplayer.setVolume(0.2);
+        alertplayer.setVolume(volume * multiplier);
         mediaplayer = new MediaPlayer(musicfile);
-        mediaplayer.setVolume(volume);
+        mediaplayer.setVolume(volume/2);
         mediaplayer.setOnEndOfMedia(new Runnable() {
             @Override
             public void run() {
+                mediaplayer.seek(Duration.ZERO);
                 mediaplayer.play();
             }
         });
@@ -68,10 +81,6 @@ public class Main extends Application {
         gridStart.setVgap(70);
         start = new Scene(gridStart, 400, 400);
         stage.setScene(start);
-
-        BackgroundImage myBI = new BackgroundImage(new Image("images/image1.jpg",400,400,false,true),
-                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT);
 
         stage.setResizable(false);
 
@@ -131,9 +140,12 @@ public class Main extends Application {
         text.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         text1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
         text2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
-        typing.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 11));
+        typing.setFont(Font.font("verdana", FontWeight.MEDIUM, FontPosture.REGULAR, 11));
         invalidPort.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
         invalid.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
+
+        typing.setStroke(Color.CYAN);
+        typing.setFill(Color.CYAN);
 
         gridJoin.setBackground(new Background(myBI));
         gridCreate.setBackground(new Background(myBI));
@@ -151,7 +163,7 @@ public class Main extends Application {
         Group endScreen = new Group();
         EndScreen = new Scene(endScreen, 400, 400);
 
-        Menu menuFile = new Menu("file");
+        Menu menuFile = new Menu("File");
         MenuItem toTxt = new MenuItem("Save log as .txt file");
         MenuItem SettingM = new MenuItem("Setting");
         MenuItem ExitM = new MenuItem("Exit");
@@ -211,15 +223,9 @@ public class Main extends Application {
             slider.setValue(volume);
             slider.setOnMouseDragged(e1 -> {
                 volume = slider.getValue();
-                mediaplayer.setVolume(volume);
-                alertplayer.setVolume(volume);
+                alertplayer.setVolume(volume * multiplier);
+                mediaplayer.setVolume(volume/2);
                 txt1.setText(df.format(volume));
-                for(int y = 0; y < 10; y++){
-                    for(int x = 0; x < 10; x++){
-                        game.enemyBoard.getCell(x, y).mediaPlayer.setVolume(volume);
-                        game.playerBoard.getCell(x, y).mediaPlayer.setVolume(volume);
-                    }
-                }
             });
 
             Group group = new Group(slider, txt, txt1);
@@ -297,6 +303,7 @@ public class Main extends Application {
 
                     NetworkConnection chatConnection = createChatClient(ip, port);
                     NetworkConnection gameConnection = createGameClient(ip, port1);
+
                     mediaplayer.play();
 
                     try {
@@ -480,19 +487,30 @@ public class Main extends Application {
         }
     }
 
-    public void game(NetworkConnection gameConn, NetworkConnection chatConn, Stage stage) throws Exception {
+    public static void game(NetworkConnection gameConn, NetworkConnection chatConn, Stage stage) throws Exception {
         //Instantiation of Battleship Game here
-        game = new Battleship(gameConn, chatConn, messages);
+        game = new Battleship(gameConn, chatConn);
 
         Group gameBoard = game.playGame();
         gameBoard.setLayoutX(520);
         gameBoard.setLayoutY(25);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        Text text = new Text("HELLO");
+        grid.add(text, 1000, 500, 1, 1);
+        grid.setBackground(new Background(gameBI));
+
+        groupGame.getChildren().addAll(grid, input, messages, gameBoard, menuBar, typing);
 
         int distance = 396;
         int distance1 = 527;
         for (int i = 0; i < 10; i++){
             Text txt = new Text();
             Text txt1 = new Text();
+            txt.setFill(Color.CYAN);
+            txt1.setFill(Color.CYAN);
             txt.setText(String.valueOf((char) ('A' + i)));
             txt1.setText(String.valueOf(i + 1));
             txt.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
@@ -506,7 +524,6 @@ public class Main extends Application {
             groupGame.getChildren().addAll(txt, txt1);
         }
 
-        groupGame.getChildren().addAll(input, messages, gameBoard, menuBar, typing);
         gameScene = new Scene(groupGame, 1000, 705);
         stage.setScene(gameScene);
     }
@@ -517,6 +534,8 @@ public class Main extends Application {
         for (int i = 0; i < 10; i++){
             Text txt = new Text();
             Text txt1 = new Text();
+            txt.setFill(Color.CYAN);
+            txt1.setFill(Color.CYAN);
             txt.setText(String.valueOf((char) ('A' + i)));
             txt1.setText(String.valueOf(i + 1));
             txt.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));

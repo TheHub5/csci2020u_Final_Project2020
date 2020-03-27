@@ -23,14 +23,12 @@ public class Battleship {
     private int shipsToPlace = 5;
     public boolean myTurn = false;
     public NetworkConnection gameConn, chatConn;
-    public TextArea messages;
     public boolean isLocked = false;
     public Group group;
 
-    public Battleship(NetworkConnection gameConn, NetworkConnection chatConn, TextArea messages){
+    public Battleship(NetworkConnection gameConn, NetworkConnection chatConn){
         this.gameConn = gameConn;
         this.chatConn = chatConn;
-        this.messages = messages;
     }
 
     public Group playGame() {
@@ -66,7 +64,7 @@ public class Battleship {
         lockIn.setOnAction(e -> {
             try {
                 if (shipsToPlace > 0 && gameConn.connThread.socket.isConnected()){
-                    messages.appendText("Place all five ships.\n");
+                    Main.messages.appendText("Place all five ships.\n");
                 }
                 if (shipsToPlace == 0 && gameConn.connThread.socket.isConnected()) {
                     isLocked = true;
@@ -96,7 +94,7 @@ public class Battleship {
                     }
                 }
             } catch (Exception ex) {
-                messages.appendText("OPPONENT HAS NOT CONNECTED\n");
+                Main.messages.appendText("OPPONENT HAS NOT CONNECTED\n");
             }
         });
 
@@ -158,6 +156,7 @@ public class Battleship {
         });
 
         restart.setOnAction(e1->{
+            popup.close();
 
         });
     }
