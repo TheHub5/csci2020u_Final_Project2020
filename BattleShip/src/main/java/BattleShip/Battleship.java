@@ -34,11 +34,14 @@ public class Battleship {
     public Group playGame() {
         group = new Group();
         Button lockIn = new Button("Lock In");
+        Main.SetStyle(lockIn, Styles.style2, Styles.styleHover1);
         Button resetShips = new Button("Reset Ships");
+        resetShips.setStyle(Styles.style4);
+        Main.SetStyle(resetShips, Styles.style4, Styles.styleHover2);
         resetShips.setLayoutX(315);
         resetShips.setLayoutY(595);
         lockIn.setLayoutX(315);
-        lockIn.setLayoutY(635);
+        lockIn.setLayoutY(632);
 
         playerBoard = new Board(event -> {
             if (shipsToPlace > 0){
@@ -106,6 +109,8 @@ public class Battleship {
 
     public void endScreen(boolean won, boolean disc) {
         Stage popup = new Stage();
+        popup.getIcons().add(new Image("images/battleship.png"));
+        popup.setResizable(false);
         popup.initModality(Modality.APPLICATION_MODAL);
         GridPane grid = new GridPane();
         Text gameOverMessage = new Text();
@@ -124,32 +129,37 @@ public class Battleship {
         Button exit = new Button("Exit");
         exit.setScaleX(1.2);
         exit.setScaleY(1.2);
+        Scene popupScene;
+        grid.setHgap(10);
+        grid.setVgap(10);
 
         if (won && !disc){
             gameOverMessage.setText("You Won");
             grid.setBackground(new Background(wonI));
             grid.add(gameOverMessage, 15, 13, 1, 1);
             grid.add(exit, 15, 1, 1, 1);
+            popupScene = new Scene(grid,500,250);
+            popup.setScene(popupScene);
+            popup.show();
         } else if (!disc) {
             gameOverMessage.setText("You Lost");
             grid.setBackground(new Background(lostI));
             grid.add(gameOverMessage, 15, 1, 1, 1);
-            grid.add(exit, 17, 3, 1, 1);
+            grid.add(exit, 15, 3, 1, 1);
+            popupScene = new Scene(grid,300,200);
+            popup.setScene(popupScene);
+            popup.show();
         } else {
-            grid.add(discM, 3, 1, 1, 1);
+            grid.add(discM, 2, 1, 1, 1);
             discM.setText("Opponent Disconnected\n");
+            popupScene = new Scene(grid,300,50);
+            popup.setScene(popupScene);
+            popup.show();
         }
 
         Button restart = new Button("Play Again");
         restart.setScaleX(1.2);
         restart.setScaleY(1.2);
-
-        grid.setHgap(10);
-        grid.setVgap(10);
-
-        Scene popupScene = new Scene(grid,300,250);
-        popup.setScene(popupScene);
-        popup.show();
 
         exit.setOnAction(e->{
             Platform.exit();

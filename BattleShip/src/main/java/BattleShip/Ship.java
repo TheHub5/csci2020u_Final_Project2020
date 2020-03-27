@@ -15,9 +15,7 @@ public class Ship extends Parent {
         health = type;
     }
 
-    public void hit() {
-        health--;
-    }
+    public void hit() { health--; }
 
     public boolean isAlive() {
         return health > 0;

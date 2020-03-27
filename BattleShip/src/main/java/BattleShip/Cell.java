@@ -31,7 +31,7 @@ public class Cell extends Rectangle {
     public void shoot() {
         wasShot = true;
         if (ship != null && ship.type != 0) {
-            mediaPlayer.setVolume(Main.volume * 4);
+            mediaPlayer.setVolume((Main.volume)*2);
             mediaPlayer.play();
             setFill(Color.RED);
             ship.hit();

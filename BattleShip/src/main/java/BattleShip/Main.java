@@ -2,9 +2,12 @@ package BattleShip;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -27,12 +30,27 @@ import java.util.Objects;
 import javafx.scene.control.Slider;
 import javafx.util.Duration;
 
+import javax.swing.text.Style;
+
 public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
 
-    //Ii
+    public static void SetStyle(Node node, String style1, String style2) {
+        node.styleProperty().bind(
+                Bindings
+                        .when(node.hoverProperty())
+                        .then(
+                                new SimpleStringProperty(style2)
+                        )
+                        .otherwise(
+                                new SimpleStringProperty(style1)
+                        )
+        );
+    }
+
+    //Initialize variables
     private MediaPlayer mediaplayer;
     private long chatPort, gamePort;
     private String ip = "localhost";
@@ -46,6 +64,10 @@ public class Main extends Application {
     private static MenuBar menuBar = new MenuBar();
     public static double volume = 0.05;
     public static double multiplier = 10;
+
+    private String blast = "src/main/resources/blast.aiff";
+    private Media sound = new Media(new File(blast).toURI().toString());
+    public MediaPlayer mediaPlayer = new MediaPlayer(sound);
 
     public static Scene start, joinServer, gameScene, createServer, EndScreen, settingsScene;
     public static Group groupGame = new Group();
@@ -62,6 +84,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         String song = "src/main/resources/epic.mp3";
         String alert = "src/main/resources/alert.wav";
+        stage.getIcons().add(new Image("images/battleship.png"));
         Media musicfile = new Media (Objects.requireNonNull(getClass().getClassLoader().getResource("epic.mp3")).toExternalForm());
         Media start_alert = new Media(new File(alert).toURI().toString());
         MediaPlayer alertplayer = new MediaPlayer(start_alert);
@@ -89,8 +112,8 @@ public class Main extends Application {
         Button create = new Button("Create Server");
         Button join = new Button("Join Server");
 
-        create.setStyle("-fx-font-size: 2em; ");
-        join.setStyle("-fx-font-size: 2em; ");
+        SetStyle(create, Styles.style, Styles.styleHover);
+        SetStyle(join, Styles.style, Styles.styleHover);
 
         gridStart.add(create, 12, 2, 1, 1);
         gridStart.add(join, 12, 3, 1, 1);
@@ -101,10 +124,13 @@ public class Main extends Application {
         TextField ipF = new TextField();
         TextField pF1 = new TextField();
         Button JS = new Button("Join Server");
+        SetStyle(JS, Styles.style2, Styles.styleHover1);
         Text text = new Text("Enter IP address:");
         Text text2 = new Text("Enter server Port:");
         Button back = new Button("<-Return");
+        SetStyle(back, Styles.style4, Styles.styleHover2);
         Button back1 = new Button("<-Return");
+        SetStyle(back1, Styles.style4, Styles.styleHover2);
 
         gridJoin.add(ipF, 3, 12, 1, 1);
         gridJoin.add(text, 2, 12, 1, 1);
@@ -119,6 +145,7 @@ public class Main extends Application {
         gridCreate.setVgap(10);
         TextField pF = new TextField();
         Button CS = new Button("Create Server");
+        SetStyle(CS, Styles.style2, Styles.styleHover1);
         Text text1 = new Text("Enter Port:");
 
         gridCreate.add(pF, 3, 12, 1, 1);
@@ -159,6 +186,7 @@ public class Main extends Application {
         input.setLayoutY(665);
         typing.setX(15);
         typing.setY(658);
+
 
         Group endScreen = new Group();
         EndScreen = new Scene(endScreen, 400, 400);
@@ -202,6 +230,8 @@ public class Main extends Application {
 
         SettingM.setOnAction(e -> {
             Stage settingPopUp = new Stage();
+            settingPopUp.setResizable(false);
+            settingPopUp.getIcons().add(new Image("images/battleship.png"));
             settingPopUp.setTitle("Settings");
 
             Text txt = new Text("Volume");
@@ -229,7 +259,7 @@ public class Main extends Application {
             });
 
             Group group = new Group(slider, txt, txt1);
-            settingsScene = new Scene(group, 400, 400);
+            settingsScene = new Scene(group, 390, 200);
             settingPopUp.setScene(settingsScene);
             settingPopUp.show();
         });
