@@ -5,7 +5,7 @@ Final Project for CSCI2020, Winter 2020
 cd into the BattleShip folder
 use command 'gradle run' to build and run project
 
-##game instrutions 
+## Game Instructions 
 || This game can be runned on 2 different computers but the instructions below are for 1 computer|| 
 1. On the first window clicks "Create Server" and enter a port number (ex.7777) to create a game
 2. Then the second player joins with "Join Server" and enters ip address (ex. localhost) and server port
