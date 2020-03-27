@@ -36,7 +36,9 @@ public class Battleship {
     public Group playGame() {
         group = new Group();
         Button lockIn = new Button("Lock In");
+        lockIn.setStyle(Main.style3);
         Button resetShips = new Button("Reset Ships");
+        resetShips.setStyle(Main.style4);
         resetShips.setLayoutX(315);
         resetShips.setLayoutY(595);
         lockIn.setLayoutX(315);

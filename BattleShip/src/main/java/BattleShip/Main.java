@@ -29,6 +29,34 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    public static String style = "-fx-background-color: \n" +
+            "        #000000,\n" +
+            "        linear-gradient(#7ebcea, #2f4b8f),\n" +
+            "        linear-gradient(#426ab7, #263e75),\n" +
+            "        linear-gradient(#395cab, #223768);\n" +
+            "    -fx-background-insets: 0,1,2,3;\n" +
+            "    -fx-background-radius: 3,2,2,2;\n" +
+            "    -fx-padding: 12 30 12 30;\n" +
+            "    -fx-text-fill: white;\n" +
+            "    -fx-font-size: 16px;";
+
+    public static String style2 = "-fx-background-color: \n" +
+            "        #000000,\n" +
+            "        linear-gradient(#7ebcea, #2f4b8f),\n" +
+            "        linear-gradient(#426ab7, #263e75),\n" +
+            "        linear-gradient(#395cab, #223768);\n" +
+            "    -fx-background-insets: 0,1,2,3;\n" +
+            "    -fx-background-radius: 3,2,2,2;\n" +
+            "    -fx-padding: 12 30 12 30;\n" +
+            "    -fx-text-fill: white;\n" +
+            "    -fx-font-size: 12px;";
+    //red style
+    public static String style3 = "-fx-background-color:linear-gradient(#f0ff35, #a9ff00),radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%); -fx-background-radius: 6, 5; -fx-background-insets: 0, 1; -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 ); -fx-text-fill: #395306";
+    //light green style
+    public static String style4 = "-fx-background-color: linear-gradient(#ff5400, #be1d00);\n" +
+            "    -fx-background-radius: 30;\n" +
+            "    -fx-background-insets: 0;\n" +
+            "    -fx-text-fill: white;";
 
     private MediaPlayer mediaplayer;
     private long chatPort, gamePort;
@@ -50,6 +78,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         String song = "src/main/resources/epic.mp3";
         String alert = "src/main/resources/alert.wav";
+        stage.getIcons().add(new Image("images/battleship.png"));
         Media musicfile = new Media (Objects.requireNonNull(getClass().getClassLoader().getResource("epic.mp3")).toExternalForm());
         Media start_alert = new Media(new File(alert).toURI().toString());
         MediaPlayer alertplayer = new MediaPlayer(start_alert);
@@ -73,6 +102,10 @@ public class Main extends Application {
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT);
 
+        BackgroundImage myBI2 = new BackgroundImage(new Image("images/image1.jpg",400,400,false,true),
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
         stage.setResizable(false);
 
         gridStart.setBackground(new Background(myBI));
@@ -80,8 +113,9 @@ public class Main extends Application {
         Button create = new Button("Create Server");
         Button join = new Button("Join Server");
 
-        create.setStyle("-fx-font-size: 2em; ");
-        join.setStyle("-fx-font-size: 2em; ");
+        create.setStyle(style);
+
+        join.setStyle(style);
 
         gridStart.add(create, 12, 2, 1, 1);
         gridStart.add(join, 12, 3, 1, 1);
@@ -92,10 +126,13 @@ public class Main extends Application {
         TextField ipF = new TextField();
         TextField pF1 = new TextField();
         Button JS = new Button("Join Server");
+        JS.setStyle(style2);
         Text text = new Text("Enter IP address:");
         Text text2 = new Text("Enter server Port:");
         Button back = new Button("<-Return");
+        back.setStyle(style4);
         Button back1 = new Button("<-Return");
+        back1.setStyle(style4);
 
         gridJoin.add(ipF, 3, 12, 1, 1);
         gridJoin.add(text, 2, 12, 1, 1);
@@ -110,6 +147,7 @@ public class Main extends Application {
         gridCreate.setVgap(10);
         TextField pF = new TextField();
         Button CS = new Button("Create Server");
+        CS.setStyle(style2);
         Text text1 = new Text("Enter Port:");
 
         gridCreate.add(pF, 3, 12, 1, 1);
@@ -135,6 +173,7 @@ public class Main extends Application {
         invalidPort.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
         invalid.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 9));
 
+
         gridJoin.setBackground(new Background(myBI));
         gridCreate.setBackground(new Background(myBI));
 
@@ -148,7 +187,9 @@ public class Main extends Application {
         typing.setX(15);
         typing.setY(658);
 
+
         Group endScreen = new Group();
+        GridPane gridsecond = new GridPane();
         EndScreen = new Scene(endScreen, 400, 400);
 
         Menu menuFile = new Menu("File");
@@ -487,7 +528,9 @@ public class Main extends Application {
         Group gameBoard = game.playGame();
         gameBoard.setLayoutX(520);
         gameBoard.setLayoutY(25);
-
+        BackgroundImage myBI = new BackgroundImage(new Image("images/image1.jpg",900,900,false,true),
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
         int distance = 396;
         int distance1 = 527;
         for (int i = 0; i < 10; i++){
