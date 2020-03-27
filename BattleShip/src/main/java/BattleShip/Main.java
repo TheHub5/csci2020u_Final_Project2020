@@ -36,7 +36,7 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
+    //Sets Button Styles
     public static void SetStyle(Node node, String style1, String style2) {
         node.styleProperty().bind(
                 Bindings
@@ -82,6 +82,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        //Creating media players for music
         String song = "src/main/resources/epic.mp3";
         String alert = "src/main/resources/alert.wav";
         stage.getIcons().add(new Image("images/battleship.png"));
@@ -227,7 +228,7 @@ public class Main extends Application {
                 }
             }
         });
-
+        //Create settings menu for sound control
         SettingM.setOnAction(e -> {
             Stage settingPopUp = new Stage();
             settingPopUp.setResizable(false);
@@ -251,6 +252,7 @@ public class Main extends Application {
             slider.setMin(0);
             slider.setMax(1);
             slider.setValue(volume);
+            //Set volume to slider value
             slider.setOnMouseDragged(e1 -> {
                 volume = slider.getValue();
                 alertplayer.setVolume(volume * multiplier);
@@ -263,17 +265,19 @@ public class Main extends Application {
             settingPopUp.setScene(settingsScene);
             settingPopUp.show();
         });
-
+        //Create server function
         create.setOnAction(e -> {
             CS.setOnAction(e1 -> {
                 try {
+                    //Set chat and game port for network connection
                     chatPort = Long.parseLong(pF.getText());
                     gamePort = Long.parseLong(pF.getText()) - 1;
                 } catch (Exception ignored){}
-
+                //Check if port is valid
                 if (chatPort > 1 && chatPort < 65534) {
                     int port = (int) chatPort;
                     int port1 = (int) gamePort;
+                    //Initialize network connection
                     NetworkConnection chatConnection = createChatServer(port);
                     NetworkConnection gameConnection = createGameServer(port1);
                     mediaplayer.play();
@@ -282,13 +286,14 @@ public class Main extends Application {
                     messages.appendText("Server running on port: " + chatPort + "\n" + "Waiting for Opponent to Connect....\n");
 
                     try {
+                        //Start connection
                         game(gameConnection, chatConnection, stage);
                         chatConnection.startConnection();
                         gameConnection.startConnection();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-
+                    //Check if player is typing
                     input.setOnKeyPressed(e2 -> {
                         try {
                             gameConnection.send(12);
@@ -296,7 +301,7 @@ public class Main extends Application {
                             input.setEditable(false);
                         }
                     });
-
+                    //Send entered text message to other player
                     input.setOnAction(e3 -> {
                         String message = "Player1: ";
                         message += input.getText();
@@ -324,7 +329,8 @@ public class Main extends Application {
                 try {
                     chatPort = Long.parseLong(pF1.getText());
                     gamePort = Long.parseLong(pF1.getText()) - 1;
-                    ip = ipF.getText();;
+                    //Get ip address
+                    ip = ipF.getText();
                 } catch (Exception ignored){}
 
                 if (chatPort > 1 && chatPort < 65534) {
@@ -333,7 +339,6 @@ public class Main extends Application {
 
                     NetworkConnection chatConnection = createChatClient(ip, port);
                     NetworkConnection gameConnection = createGameClient(ip, port1);
-
                     mediaplayer.play();
 
                     try {
@@ -345,6 +350,7 @@ public class Main extends Application {
                     }
 
                     try {
+                        //Check if opponent has connected
                         Thread.sleep(100);
                         if (chatConnection.connThread.socket.isConnected()) {
                             chatConnection.send("OPPONENT HAS CONNECTED!");
@@ -391,6 +397,7 @@ public class Main extends Application {
     }
 
     private Server createChatServer(int port) {
+        //Handle data sent from client
         return new Server(port, (data) -> {
             Platform.runLater(() -> {
                 input.setEditable(true);
@@ -400,6 +407,7 @@ public class Main extends Application {
     }
 
     private Client createChatClient(String ip, int port) {
+        //Handle data sent from server
         return new Client(ip, port, (data) -> {
             Platform.runLater(() -> {
                 messages.appendText(data.toString() + "\n");
@@ -408,6 +416,7 @@ public class Main extends Application {
     }
 
     private Server createGameServer(int port) {
+        //Handle game data sent from client
         return new Server(port, (data) -> {
             Platform.runLater(() -> {
                 try {
@@ -420,6 +429,7 @@ public class Main extends Application {
     }
 
     private Client createGameClient(String ip, int port) {
+        //Handle game data sent from client
         return new Client(ip, port, (data) -> {
             Platform.runLater(() -> {
                 try {
@@ -433,6 +443,7 @@ public class Main extends Application {
 
     private void handleOutputStream(Serializable data) throws Exception {
         if (data instanceof String) {
+            //Executed when player loses game
             try {
                 game.chatConn.send("");
                 game.endScreen(true, false);
@@ -450,13 +461,17 @@ public class Main extends Application {
             }
         }
         if (data instanceof Integer[]){
-            Integer[] xy = (Integer[]) data;
-            game.playerBoard.getCell(xy[0], xy[1]).shoot();
+            //Executed when opponent chooses attack cell game
+            Integer[] xy = (Integer[]) data; //Attack coordinates
+            game.playerBoard.getCell(xy[0], xy[1]).shoot(); //Shoot correct cell selected
             if (game.playerBoard.getCell(xy[0], xy[1]).ship != null && !game.playerBoard.getCell(xy[0], xy[1]).ship.isAlive()) {
+                //Execute when u have sunk a ship
                 game.chatConn.send("You have sunk a ship!");
             }
+            //Check if opponent has won game
             if (game.playerBoard.checkWin()) {
                 try {
+                    //Execute if opponent has won game
                     game.gameConn.send("");
                     game.endScreen(false, false);
                 } catch (Exception e) {
@@ -465,8 +480,9 @@ public class Main extends Application {
             }
         }
         if (data instanceof Integer){
+            //Execute when data opponent is typing
             int value = (int) data;
-            if (value == 12){
+            if (value == 12) {
                 typing.setText("Opponent is Typing......");
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
@@ -480,24 +496,31 @@ public class Main extends Application {
             }
         }
         if (data instanceof Boolean){
+            //Execute when opponent is done turn
             game.myTurn = true;
             setCellsOpacity(1);
         }
         if (data instanceof boolean[][]){
+            //Get array if ships are vertically placed or not
             vertical = (boolean[][]) data;
         }
         if (data instanceof int[][] && vertical != null){
+            //Get ships from enemy board
             int[][] gridLayout = (int[][]) data;
             setAxis(groupGame);
-
+            //Create enemy board from ship layout
             game.enemyBoard = new Board(gridLayout, vertical, event ->{
+                //Check if lock in occurred and it is your turn
                 if (game.isLocked && game.myTurn){
-                    Cell cell = (Cell) event.getSource();
+                    Cell cell = (Cell) event.getSource(); //Get attack cell
+                    //Check if cell was already shot
                     if (!cell.wasShot) {
+                        //Shoot cell
                         cell.shoot();
                         game.myTurn = false;
                         setCellsOpacity(0.5);
                         try {
+                            //Send attacked cell data to opponent
                             Boolean a = true;
                             Integer[] xy = new Integer[2];
                             xy[0] = cell.x;
@@ -518,9 +541,9 @@ public class Main extends Application {
     }
 
     public static void game(NetworkConnection gameConn, NetworkConnection chatConn, Stage stage) throws Exception {
-        //Instantiation of Battleship Game here
+        //Instantiation of Battleship Game
         game = new Battleship(gameConn, chatConn);
-
+        //Get player board
         Group gameBoard = game.playGame();
         gameBoard.setLayoutX(520);
         gameBoard.setLayoutY(25);
@@ -528,12 +551,12 @@ public class Main extends Application {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        Text text = new Text("HELLO");
+        Text text = new Text("");
         grid.add(text, 1000, 500, 1, 1);
         grid.setBackground(new Background(gameBI));
 
         groupGame.getChildren().addAll(grid, input, messages, gameBoard, menuBar, typing);
-
+        //Create numbers and letters axis
         int distance = 396;
         int distance1 = 527;
         for (int i = 0; i < 10; i++){
@@ -557,7 +580,7 @@ public class Main extends Application {
         gameScene = new Scene(groupGame, 1000, 705);
         stage.setScene(gameScene);
     }
-
+    //Create numbers and letters axis
     private void setAxis(Group group){
         int distance = 50;
         int distance1 = 527;
@@ -579,7 +602,7 @@ public class Main extends Application {
             group.getChildren().addAll(txt, txt1);
         }
     }
-
+    //Set cell Opacity
     private void setCellsOpacity(double value){
         for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++){
