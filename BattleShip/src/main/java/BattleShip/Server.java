@@ -2,7 +2,7 @@ package BattleShip;
 
 import java.io.Serializable;
 import java.util.function.Consumer;
-
+//Server class that inherits from NetworkConnection class
 public class Server extends NetworkConnection {
 
     private int port;

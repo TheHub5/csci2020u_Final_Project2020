@@ -15,9 +15,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-
+//class primarily for placing the ships and detecting if game has been won or lost
 public class Battleship {
-
+    //initialize variables
     public Board playerBoard;
     public Board enemyBoard;
     private int shipsToPlace = 5;
@@ -33,9 +33,9 @@ public class Battleship {
 
     public Group playGame() {
         group = new Group();
-        Button lockIn = new Button("Lock In");
+        Button lockIn = new Button("Lock In"); //lock in button
         Main.SetStyle(lockIn, Styles.style2, Styles.styleHover1);
-        Button resetShips = new Button("Reset Ships");
+        Button resetShips = new Button("Reset Ships"); //reset button
         resetShips.setStyle(Styles.style4);
         Main.SetStyle(resetShips, Styles.style4, Styles.styleHover2);
         resetShips.setLayoutX(315);
@@ -106,10 +106,10 @@ public class Battleship {
         playerBoard.playerGrid.setLayoutY(350);
         return group;
     }
-
+    //function for endscreen. Outputs messages and images for winning and losing
     public void endScreen(boolean won, boolean disc) {
         Stage popup = new Stage();
-        popup.getIcons().add(new Image("images/battleship.png"));
+        popup.getIcons().add(new Image("images/battleship.png")); //battleship icon
         popup.setResizable(false);
         popup.initModality(Modality.APPLICATION_MODAL);
         GridPane grid = new GridPane();

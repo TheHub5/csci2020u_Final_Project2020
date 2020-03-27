@@ -1,7 +1,7 @@
 package BattleShip;
 
 import javafx.scene.Parent;
-
+//Ship class, used for setting variables of a ship such as health, position, ship size, and orientation
 public class Ship extends Parent {
 
     public int type;

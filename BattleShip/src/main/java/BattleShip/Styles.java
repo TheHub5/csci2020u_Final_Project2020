@@ -1,5 +1,5 @@
 package BattleShip;
-
+//class used for storing button styles. Other classes use these styles
 public class Styles {
     public static String style = "-fx-background-color: \n" +
             "        #000000,\n" +

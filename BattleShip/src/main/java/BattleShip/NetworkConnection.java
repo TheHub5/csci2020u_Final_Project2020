@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.function.Consumer;
-
+//Class used for handling socket connection and socket data
 public abstract class NetworkConnection {
 
     public ConnectionThread connThread = new ConnectionThread();

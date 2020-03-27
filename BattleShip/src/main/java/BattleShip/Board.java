@@ -9,7 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-
+//Board class to initialize the board and add cells and the ships
 public class Board {
     VBox playerGrid = new VBox();
     public int ships = 5;
@@ -18,7 +18,7 @@ public class Board {
     BackgroundImage water = new BackgroundImage(new Image("images/water.jpg",400,400,false,true),
             BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
             BackgroundSize.DEFAULT);
-
+    //board action if clicked
     public Board(EventHandler<? super MouseEvent> handler) {
         for (int y = 0; y < 10; y++) {
             HBox row = new HBox();
@@ -27,11 +27,11 @@ public class Board {
                 c.setOnMouseClicked(handler);
                 row.getChildren().add(c);
             }
-            playerGrid.setBackground(new Background(water));
+            playerGrid.setBackground(new Background(water)); //background water image
             playerGrid.getChildren().add(row);
         }
     }
-
+    //board sent through socket
     public Board(int[][] gridLayout, boolean[][] vertical, EventHandler<? super MouseEvent> handler) {
         playerGrid.getChildren().clear();
         for (int y = 0; y < 5; y++){
@@ -76,11 +76,11 @@ public class Board {
             playerGrid.getChildren().add(row);
         }
     }
-
+    //check if game is won
     public boolean checkWin(){
         return this.ships == 0;
     }
-
+    //setting ships
     public boolean placeShip(Ship ship, int x, int y) {
         if (canPlaceShip(ship, x, y)) {
             int length = ship.type;
@@ -111,7 +111,7 @@ public class Board {
     public Cell getCell(int x, int y) {
         return (Cell)((HBox)playerGrid.getChildren().get(y)).getChildren().get(x);
     }
-
+    //get cell neighbors, for placement
     private Cell[] getNeighbors(int x, int y) {
         Point2D[] points = new Point2D[] {
                 new Point2D(x - 1, y),
@@ -129,7 +129,7 @@ public class Board {
         }
         return neighbors.toArray(new Cell[0]);
     }
-
+    //check if you can place a ship based on surrounding ships
     private boolean canPlaceShip(Ship ship, int x, int y) {
         int length = ship.type;
 

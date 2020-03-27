@@ -5,7 +5,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import java.io.File;
-
+//Cell class mainly for sink and shoot functions, along with coloring a cell when it's clicked on
 public class Cell extends Rectangle {
     public int x, y;
     public Ship ship;
