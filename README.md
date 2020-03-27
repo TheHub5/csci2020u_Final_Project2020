@@ -1,4 +1,8 @@
 # csci2020u_Final_Project2020
+https://github.com/TheHub5/csci2020u_Final_Project2020
+By: Hubert Giang, Andrew Murdoch, Raza Kazmi, and Nicholas Bode
+
+
 Final Project for CSCI2020, Winter 2020
 
 ## Use Instructions
@@ -11,3 +15,4 @@ use command 'gradle run' to build and run project
 2. Then the second player joins with "Join Server" and enters ip address (ex. localhost) and server port
 (ex. 7777) to join the game
 3. Set grids up and play!
+
